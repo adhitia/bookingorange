@@ -13,6 +13,14 @@
     <%= f.label :branch_id, "Cabang" %>
     <%= f.collection_select :branch_id, Branch.all, :id, :name, { prompt: "Pilih Cabang" }, { class: "form-select" } %>
   </div>
+  <div class="mb-3">
+    <%= f.label :password, "Password" %>
+    <%= f.password_field :password, class: "form-control" %>
+  </div>
+  <div class="mb-3">
+    <%= f.label :password_confirmation, "Konfirmasi Password" %>
+    <%= f.password_field :password_confirmation, class: "form-control" %>
+  </div>
   <div class="d-grid">
     <%= f.submit "Simpan Staff Cabang", class: "btn btn-primary" %>
   </div>

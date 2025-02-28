@@ -9,6 +9,14 @@
     <%= f.label :name, "Nama" %>
     <%= f.text_field :name, class: "form-control" %>
   </div>
+  <div class="mb-3">
+    <%= f.label :password, "Password" %>
+    <%= f.password_field :password, class: "form-control" %>
+  </div>
+  <div class="mb-3">
+    <%= f.label :password_confirmation, "Konfirmasi Password" %>
+    <%= f.password_field :password_confirmation, class: "form-control" %>
+  </div>
   <div class="d-grid">
     <%= f.submit "Simpan Customer Service", class: "btn btn-primary" %>
   </div>
