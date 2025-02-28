@@ -1,0 +1,35 @@
+<h1>Detail Booking</h1>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <p><strong>Tanggal Booking:</strong> 
+      <%= @booking.booking_date.present? ? @booking.booking_date.strftime("%d-%m-%Y") : "-" %>
+    </p>
+    <p><strong>Cabang:</strong> 
+      <%= @booking.branch.name if @booking.branch %>
+    </p>
+    <p><strong>Dokter:</strong> 
+      <%= @booking.doctor.name if @booking.doctor %>
+    </p>
+    <% if @booking.schedule.present? %>
+      <p><strong>Jadwal:</strong> 
+        <p><strong>Tanggal Booking:</strong> <%= indonesian_date(@booking.booking_date) %></p>
+      </p>
+    <% else %>
+      <p><strong>Jadwal:</strong> -</p>
+    <% end %>
+    <% if @booking.booking_time.present? %>
+      <p><strong>Waktu Slot:</strong> <%= @booking.booking_time.strftime("%H:%M") %></p>
+    <% end %>
+    <p><strong>Nama Customer:</strong> <%= @booking.customer_name %></p>
+    <p><strong>Telepon Customer:</strong> <%= @booking.customer_phone %></p>
+    <p><strong>Status:</strong> <%= @booking.status.titleize %></p>
+  </div>
+</div>
+
+<%= link_to "Kembali", :back, class: "btn btn-secondary" %>
+<% if current_user&.staff_cabang? %>
+  <%= link_to "Edit", edit_staff_booking_path(@booking), class: "btn btn-warning" %>
+  <%= button_to "Cancel", cancel_staff_booking_path(@booking), method: :patch, data: { confirm: "Anda yakin?" }, class: "btn btn-danger" %>
+  <%= button_to "Complete", complete_staff_booking_path(@booking), method: :patch, data: { confirm: "Anda yakin?" }, class: "btn btn-success" %>
+<% end %>

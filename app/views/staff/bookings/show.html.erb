@@ -1,0 +1,17 @@
+<h1>Detail Booking (Staff Cabang)</h1>
+<p><strong>Tanggal Booking:</strong> <%= @booking.booking_date.strftime("%d-%m-%Y") if @booking.booking_date %></p>
+<p><strong>Cabang:</strong> <%= @booking.branch.name %></p>
+<p><strong>Dokter:</strong> <%= @booking.doctor.name %></p>
+<p><strong>Jadwal:</strong>
+  <% if @booking.booking_date.present? %>
+    <%= "#{@booking.booking_date.strftime("%d-%m-%Y")} #{@booking.booking_time.strftime('%H:%M')}" %>
+  <% else %>
+    -
+  <% end %>
+</p>
+<p><strong>Nama Customer:</strong> <%= @booking.customer_name %></p>
+<p><strong>Telepon Customer:</strong> <%= @booking.customer_phone %></p>
+<p><strong>Status:</strong> <%= @booking.status.titleize %></p>
+
+<%= link_to "Edit/Reschedule", edit_staff_booking_path(@booking), class: "btn btn-warning" %>
+<%= link_to "Kembali ke Daftar Booking", staff_bookings_path, class: "btn btn-secondary" %>

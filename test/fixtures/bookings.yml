@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  branch: one
+  doctor: one
+  schedule: one
+  created_by: one
+  customer_name: MyString
+  customer_phone: MyString
+  status: 1
+
+two:
+  branch: two
+  doctor: two
+  schedule: two
+  created_by: two
+  customer_name: MyString
+  customer_phone: MyString
+  status: 1

@@ -1,0 +1,32 @@
+<h1>Detail Booking</h1>
+
+<p>
+  <strong>Tanggal Booking:</strong>
+  <%= @booking.booking_date.present? ? @booking.booking_date.strftime("%d-%m-%Y") : "-" %>
+</p>
+<p>
+  <strong>Cabang:</strong> <%= @booking.branch.name %>
+</p>
+<p>
+  <strong>Dokter:</strong> <%= @booking.doctor.name %>
+</p>
+<p>
+  <strong>Jadwal:</strong>
+  <% if @booking.schedule.present? %>
+    <%= "#{@booking.schedule.day} #{@booking.schedule.start_time.strftime("%H:%M")} - #{@booking.schedule.end_time.strftime("%H:%M")}" %>
+  <% else %>
+    -
+  <% end %>
+</p>
+<p>
+  <strong>Nama Customer:</strong> <%= @booking.customer_name %>
+</p>
+<p>
+  <strong>Telepon Customer:</strong> <%= @booking.customer_phone %>
+</p>
+<p>
+  <strong>Status:</strong> <%= @booking.status.titleize %>
+</p>
+
+<%= link_to "Edit", edit_admin_booking_path(@booking), class: "btn btn-warning" %>
+<%= link_to "Kembali ke Daftar Booking", admin_bookings_path, class: "btn btn-secondary" %>

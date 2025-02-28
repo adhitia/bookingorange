@@ -1,0 +1,58 @@
+<h1>Time Table Jadwal 7 Hari Kedepan</h1>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th style="width: 80px;">Waktu</th>
+      <% @dates.each do |date| %>
+        <th><%= indonesian_date(date) %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody>
+    <% @time_slots.each do |slot| %>
+      <tr>
+        <td><strong><%= slot %></strong></td>
+        <% @dates.each do |date| %>
+          <% key = [date, slot] %>
+          <% # Dapatkan nama hari dalam bahasa Indonesia untuk tanggal ini
+             day = convert_to_indonesian(date.strftime("%A"))
+          %>
+          <% # Cari jadwal di cabang staff yang aktif untuk hari tersebut dan yang mencakup slot ini
+             matching_schedules = current_user.branch.schedules.select do |s|
+               s.day == day &&
+               slot >= s.start_time.strftime("%H:%M") &&
+               slot < s.end_time.strftime("%H:%M")
+             end
+          %>
+          <% cell_bg = if matching_schedules.empty?
+                        "#F2F2F2"  # Tidak ada jadwal, gunakan warna netral
+                      elsif @booking_lookup[key]
+                        "#F07C00"  # Booking sudah ada, gunakan warna oranye
+                      else
+                        "#D8CD9C45" # Slot kosong, tapi ada jadwal dokter
+                      end
+          %>
+          <td style="vertical-align: middle; text-align: center; background-color: <%= cell_bg %>;">
+            <% if matching_schedules.empty? %>
+              <em>No Doctor</em>
+            <% else %>
+              <% if @booking_lookup[key] %>
+                <!-- Jika slot sudah terbooking, klik untuk edit booking -->
+                <%= link_to edit_staff_booking_path(@booking_lookup[key]), class: "text-decoration-none text-dark" do %>
+                  <strong><%= @booking_lookup[key].customer_name %></strong><br>
+                  <small><%= @booking_lookup[key].doctor.name %></small>
+                <% end %>
+              <% else %>
+                <!-- Jika slot kosong dan ada jadwal dokter, klik untuk membuat booking baru -->
+                <%= link_to new_staff_booking_path(booking_date: date, booking_time: slot), class: "d-block text-decoration-none" do %>
+                  <span style="opacity: 0.3;"><%= slot %></span>
+                <% end %>
+              <% end %>
+            <% end %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

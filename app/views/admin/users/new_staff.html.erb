@@ -1,0 +1,21 @@
+<h1>Tambah Staff Cabang</h1>
+
+<%= form_with model: @user, url: create_staff_admin_users_path, local: true do |f| %>
+  <div class="mb-3">
+    <%= f.label :email, "Email" %>
+    <%= f.email_field :email, class: "form-control" %>
+  </div>
+  <div class="mb-3">
+    <%= f.label :name, "Nama" %>
+    <%= f.text_field :name, class: "form-control" %>
+  </div>
+  <div class="mb-3">
+    <%= f.label :branch_id, "Cabang" %>
+    <%= f.collection_select :branch_id, Branch.all, :id, :name, { prompt: "Pilih Cabang" }, { class: "form-select" } %>
+  </div>
+  <div class="d-grid">
+    <%= f.submit "Simpan Staff Cabang", class: "btn btn-primary" %>
+  </div>
+<% end %>
+
+<%= link_to "Kembali", staffs_admin_users_path, class: "btn btn-secondary mt-3" %>

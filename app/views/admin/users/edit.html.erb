@@ -1,0 +1,23 @@
+<h1>Edit User</h1>
+
+<%= form_with model: @user, url: admin_user_path(@user), local: true do |f| %>
+  <div class="mb-3">
+    <%= f.label :email, "Email" %>
+    <%= f.email_field :email, class: "form-control" %>
+  </div>
+  <div class="mb-3">
+    <%= f.label :name, "Nama" %>
+    <%= f.text_field :name, class: "form-control" %>
+  </div>
+  <% if @user.staff_cabang? %>
+    <div class="mb-3">
+      <%= f.label :branch_id, "Cabang" %>
+      <%= f.collection_select :branch_id, Branch.all, :id, :name, { prompt: "Pilih Cabang" }, { class: "form-select" } %>
+    </div>
+  <% end %>
+  <div class="d-grid">
+    <%= f.submit "Update User", class: "btn btn-primary" %>
+  </div>
+<% end %>
+
+<%= link_to "Kembali", request.referer || customer_services_admin_users_path, class: "btn btn-secondary mt-3" %>

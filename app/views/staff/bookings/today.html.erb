@@ -1,0 +1,38 @@
+<h1>Jadwal Hari Ini</h1>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Waktu Slot</th>
+      <th>Dokter</th>
+      <th>Customer</th>
+      <th>Status</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @bookings.each do |booking| %>
+      <tr>
+        <td>
+          <% if booking.booking_time.present? %>
+            <%= booking.booking_time.strftime("%H:%M") %>
+          <% else %>
+            -
+          <% end %>
+        </td>
+        <td><%= booking.doctor.name if booking.doctor %></td>
+        <td>
+          <%= booking.customer_name %><br>
+          <small><%= booking.customer_phone %></small>
+        </td>
+        <td><%= booking.status.titleize %></td>
+        <td>
+          <%= link_to "Show", staff_booking_path(booking), class: "btn btn-sm btn-info" %>
+          <%= link_to "Edit/Reschedule", edit_staff_booking_path(booking), class: "btn btn-sm btn-warning" %>
+          <%= button_to "Cancel", cancel_staff_booking_path(booking), method: :patch, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-danger" %>
+          <%= button_to "Complete", complete_staff_booking_path(booking), method: :patch, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-success" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

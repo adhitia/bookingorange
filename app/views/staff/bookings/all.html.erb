@@ -1,0 +1,54 @@
+<h1>Semua Jadwal</h1>
+
+<!-- Form Filter -->
+<%= form_with url: all_staff_bookings_path, method: :get, local: true do |f| %>
+  <div class="row g-3 mb-3">
+    <div class="col-md-4">
+      <%= label_tag :date, "Tanggal" %>
+      <%= date_field_tag :date, params[:date], class: "form-control" %>
+    </div>
+    <div class="col-md-4">
+      <%= label_tag :doctor_id, "Dokter" %>
+      <%= select_tag :doctor_id, options_from_collection_for_select(@doctors, :id, :name, params[:doctor_id]), prompt: "Pilih Dokter", class: "form-select" %>
+    </div>
+    <div class="col-md-4">
+      <%= label_tag :status, "Status" %>
+      <%= select_tag :status, options_for_select(Booking.statuses.keys.map { |s| [s.titleize, s] }, params[:status]), prompt: "Pilih Status", class: "form-select" %>
+    </div>
+  </div>
+  <%= submit_tag "Filter", class: "btn btn-primary" %>
+<% end %>
+
+<!-- Tabel Semua Booking -->
+<table class="table table-striped mt-3">
+  <thead>
+    <tr>
+      <th>Tanggal</th>
+      <th>Waktu Slot</th>
+      <th>Dokter</th>
+      <th>Customer</th>
+      <th>Status</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @bookings.each do |booking| %>
+      <tr>
+        <td><%= booking.booking_date.strftime("%d-%m-%Y") if booking.booking_date %></td>
+        <td><%= booking.booking_time.strftime("%H:%M") if booking.booking_time %></td>
+        <td><%= booking.doctor.name if booking.doctor %></td>
+        <td>
+          <%= booking.customer_name %><br>
+          <small><%= booking.customer_phone %></small>
+        </td>
+        <td><%= booking.status.titleize %></td>
+        <td>
+          <%#= link_to "Show", staff_booking_path(booking), class: "btn btn-sm btn-info" %>
+          <%= link_to "Edit", edit_staff_booking_path(booking), class: "btn btn-sm btn-warning" %>
+          <%= button_to "Cancel", cancel_staff_booking_path(booking), method: :patch, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-danger" %>
+          <%= button_to "Complete", complete_staff_booking_path(booking), method: :patch, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-success" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

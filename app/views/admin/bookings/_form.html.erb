@@ -1,0 +1,60 @@
+<%= form_with(model: [:admin, booking], local: true) do |form| %>
+  <% if booking.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(booking.errors.count, "error") %> terjadi:</h4>
+      <ul>
+        <% booking.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <!-- Field untuk tanggal booking -->
+  <div class="mb-3">
+    <%= form.label :booking_date, "Tanggal Booking", class: "form-label" %>
+    <%= form.date_field :booking_date, class: "form-control" %>
+  </div>
+
+  <!-- Field untuk memilih cabang -->
+  <div class="mb-3">
+    <%= form.label :branch_id, "Cabang", class: "form-label" %>
+    <%= form.collection_select :branch_id, Branch.all, :id, :name, { prompt: "Pilih Cabang" }, { class: "form-select" } %>
+  </div>
+
+  <!-- Field untuk memilih dokter -->
+  <div class="mb-3">
+    <%= form.label :doctor_id, "Dokter", class: "form-label" %>
+    <%= form.collection_select :doctor_id, Doctor.all, :id, :name, { prompt: "Pilih Dokter" }, { class: "form-select" } %>
+  </div>
+
+  <!-- Field untuk memilih jadwal (slot rutin) -->
+  <div class="mb-3">
+    <%= form.label :schedule_id, "Jadwal", class: "form-label" %>
+    <%= form.collection_select :schedule_id, Schedule.all, :id, ->(s) {
+          # Menampilkan hari dan jam (format: "Senin 08:00 - 12:00")
+          "#{s.day} #{s.start_time.strftime("%H:%M")} - #{s.end_time.strftime("%H:%M")}"
+        }, { prompt: "Pilih Jadwal" }, { class: "form-select" } %>
+  </div>
+
+  <!-- Field untuk data customer -->
+  <div class="mb-3">
+    <%= form.label :customer_name, "Nama Customer", class: "form-label" %>
+    <%= form.text_field :customer_name, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :customer_phone, "Telepon Customer", class: "form-label" %>
+    <%= form.text_field :customer_phone, class: "form-control" %>
+  </div>
+
+  <!-- Field untuk status booking -->
+  <div class="mb-3">
+    <%= form.label :status, "Status Booking", class: "form-label" %>
+    <%= form.select :status, Booking.statuses.keys.map { |s| [s.titleize, s] }, { prompt: "Pilih Status" }, { class: "form-select" } %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.submit "Simpan Booking", class: "btn btn-primary" %>
+  </div>
+<% end %>

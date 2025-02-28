@@ -1,0 +1,5 @@
+var options = "<option value=''>Pilih Slot</option>";
+<% @available_slots.each do |slot| %>
+  options += "<option value='<%= "#{slot[:schedule].id}|#{slot[:slot_time].strftime('%H:%M')}" %>'><%= "#{slot[:schedule].doctor.name}: #{slot[:slot_time].strftime('%H:%M')} - #{(slot[:slot_time] + 30.minute).strftime('%H:%M')}" %></option>";
+<% end %>
+$("#available_slots_select").html(options);

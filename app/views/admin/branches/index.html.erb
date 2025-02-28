@@ -1,0 +1,26 @@
+<h1>Daftar Cabang</h1>
+<%= link_to "Tambah Cabang Baru", new_admin_branch_path, class: "btn btn-success mb-3" %>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nama Cabang</th>
+      <th>Lokasi</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @branches.each do |branch| %>
+      <tr>
+        <td><%= branch.id %></td>
+        <td><%= branch.name %></td>
+        <td><%= branch.location %></td>
+        <td>
+          <%= link_to "Edit", edit_admin_branch_path(branch), class: "btn btn-sm btn-warning" %>
+          <%= link_to "Hapus", admin_branch_path(branch), method: :delete, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-danger" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

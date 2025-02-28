@@ -1,0 +1,44 @@
+<h1>Management Booking - Admin</h1>
+<%= link_to "Tambah Booking Baru", new_admin_booking_path, class: "btn btn-success mb-3" %>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Tanggal Booking</th>
+      <th>Cabang</th>
+      <th>Dokter</th>
+      <th>Jadwal</th>
+      <th>Customer</th>
+      <th>Status</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @bookings.each do |booking| %>
+      <tr>
+        <td><%= booking.id %></td>
+        <td><%= booking.booking_date.present? ? booking.booking_date.strftime("%d-%m-%Y") : "-" %></td>
+        <td><%= booking.branch.name %></td>
+        <td><%= booking.doctor.name %></td>
+        <td>
+          <% if booking.schedule.present? %>
+            <%= "#{booking.schedule.day} #{booking.schedule.start_time.strftime("%H:%M")} - #{booking.schedule.end_time.strftime("%H:%M")}" %>
+          <% else %>
+            -
+          <% end %>
+        </td>
+        <td>
+          <%= booking.customer_name %><br>
+          <small><%= booking.customer_phone %></small>
+        </td>
+        <td><%= booking.status.titleize %></td>
+        <td>
+          <%= link_to "Show", admin_booking_path(booking), class: "btn btn-sm btn-info" %>
+          <%= link_to "Edit", edit_admin_booking_path(booking), class: "btn btn-sm btn-warning" %>
+          <%= link_to "Hapus", admin_booking_path(booking), method: :delete, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-danger" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -1,0 +1,26 @@
+<%= form_with(model: [:admin, branch], local: true) do |form| %>
+  <% if branch.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(branch.errors.count, "error") %> terjadi:</h4>
+      <ul>
+        <% branch.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :name, "Nama Cabang", class: "form-label" %>
+    <%= form.text_field :name, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :location, "Lokasi", class: "form-label" %>
+    <%= form.text_field :location, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.submit "Simpan Cabang", class: "btn btn-primary" %>
+  </div>
+<% end %>

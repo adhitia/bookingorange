@@ -1,0 +1,67 @@
+// Definisi variabel warna (ambil dari daftar yang Anda izinkan)
+$orange-1: #F07C00;
+$orange-2: #FF9800;
+$orange-3: #F58634;
+$orange-4: #F9C6A2; // warna lebih lembut
+$dark-1:   #242424;
+$dark-2:   #5B4A4E;
+$black:    #000000;
+// Di daftar Anda ada #D8CD9C45, namun itu bukan format hex yang valid.
+// Mungkin maksudnya #D8CD9C atau #CD9C45, silakan sesuaikan jika diperlukan.
+$beige:    #D8CD9C;
+
+// Navbar dengan gradasi oranye
+.navbar-orange {
+  background: linear-gradient(to right, $orange-1, $orange-2);
+  .navbar-brand, .nav-link {
+    color: #fff !important;
+  }
+  .nav-link:hover {
+    background-color: $orange-3;
+    color: #fff !important;
+  }
+}
+
+// Sidebar
+.sidebar {
+  background-color: $orange-3; 
+  color: #fff;
+  min-height: 100vh; // agar sidebar membentang penuh
+  .nav-link {
+    color: #fff;
+    &:hover {
+      background-color: $orange-1;
+      color: #fff;
+    }
+  }
+}
+
+// Body background supaya tidak putih polos
+body {
+  background-color: $beige; // warna lembut
+}
+
+// Main content
+main {
+  background-color: #fff; // tetap putih agar teks lebih jelas
+  padding: 1rem;
+}
+
+// Table styling (opsional)
+.table-custom thead {
+  background-color: $orange-4; // oranye lembut
+  color: $black;
+}
+.table-custom tbody tr:hover {
+  background-color: lighten($orange-4, 15%); 
+}
+
+// Alert styling (sekadar contoh)
+.alert-success {
+  background-color: #DFF0D8;
+  color: #3C763D;
+}
+.alert-danger {
+  background-color: #F2DEDE;
+  color: #A94442;
+}

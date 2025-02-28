@@ -1,0 +1,32 @@
+<h1>Daftar Jadwal Dokter</h1>
+<%= link_to "Tambah Jadwal Baru", new_admin_schedule_path, class: "btn btn-success mb-3" %>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Dokter</th>
+      <th>Cabang</th>
+      <th>Hari</th>
+      <th>Jam Mulai</th>
+      <th>Jam Selesai</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @schedules.each do |schedule| %>
+      <tr>
+        <td><%= schedule.id %></td>
+        <td><%= schedule.doctor.name %></td>
+        <td><%= schedule.branch.name %></td>
+        <td><%= schedule.day %></td>
+        <td><%= schedule.start_time.strftime("%H:%M") if schedule.start_time %></td>
+        <td><%= schedule.end_time.strftime("%H:%M") if schedule.end_time %></td>
+        <td>
+          <%= link_to "Edit", edit_admin_schedule_path(schedule), class: "btn btn-sm btn-warning" %>
+          <%= link_to "Hapus", admin_schedule_path(schedule), method: :delete, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-danger" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

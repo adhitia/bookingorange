@@ -1,0 +1,26 @@
+<h1>Daftar Dokter</h1>
+<%= link_to "Tambah Dokter Baru", new_admin_doctor_path, class: "btn btn-success mb-3" %>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nama Dokter</th>
+      <th>Cabang</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @doctors.each do |doctor| %>
+      <tr>
+        <td><%= doctor.id %></td>
+        <td><%= doctor.name %></td>
+        <td><%= doctor.branch.try(:name) %></td>
+        <td>
+          <%= link_to "Edit", edit_admin_doctor_path(doctor), class: "btn btn-sm btn-warning" %>
+          <%= link_to "Hapus", admin_doctor_path(doctor), method: :delete, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-danger" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

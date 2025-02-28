@@ -1,0 +1,26 @@
+<%= form_with(model: [:admin, doctor], local: true) do |form| %>
+  <% if doctor.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(doctor.errors.count, "error") %> terjadi:</h4>
+      <ul>
+        <% doctor.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :name, "Nama Dokter", class: "form-label" %>
+    <%= form.text_field :name, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :branch_id, "Cabang", class: "form-label" %>
+    <%= form.collection_select :branch_id, Branch.all, :id, :name, { prompt: "Pilih Cabang" }, { class: "form-select" } %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.submit "Simpan Dokter", class: "btn btn-primary" %>
+  </div>
+<% end %>

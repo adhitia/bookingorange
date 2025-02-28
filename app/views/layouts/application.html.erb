@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Orange Dental Booking</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-orange">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">Orange Dental Booking</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+        <% if user_signed_in? %>
+        <ul class="navbar-nav">
+          <li class="nav-item me-2">
+            <span class="navbar-text text-white">Halo, <%= current_user.name %></span>
+          </li>
+          <li class="nav-item">
+            <%= button_to "Logout", destroy_user_session_path, method: :delete, data: { confirm: "Anda yakin ingin logout?" }, class: "btn btn-outline-danger" %>
+          </li>
+        </ul>
+        <% else %>
+        <%= link_to "Login", new_user_session_path, class: "nav-link text-white" %>
+        <% end %>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Kontainer utama -->
+  <div class="container-fluid min-vh-100">
+    <div class="row min-vh-100">
+      <!-- Sidebar -->
+      <aside class="col-md-2 sidebar d-flex flex-column p-3">
+        <ul class="nav flex-column">
+          <li class="nav-item mb-2">
+            <%= link_to "Dashboard", root_path, class: "nav-link" %>
+          </li>
+          <% if current_user&.admin? %>
+          <li class="nav-item mb-2">
+            <%= link_to "Management Cabang", admin_branches_path, class: "nav-link" %>
+          </li>
+          <li class="nav-item mb-2">
+            <%= link_to "Management Dokter", admin_doctors_path, class: "nav-link" %>
+          </li>
+          <li class="nav-item mb-2">
+            <%= link_to "Management Jadwal", admin_schedules_path, class: "nav-link" %>
+          </li>
+          <li class="nav-item mb-2">
+            <%= link_to "Management Booking", admin_bookings_path, class: "nav-link" %>
+          </li>
+          <!-- Menu Management User dengan submenu collapse -->
+          <li class="nav-item mb-2">
+            <a class="nav-link" data-bs-toggle="collapse" href="#managementUserCollapse" role="button" aria-expanded="false" aria-controls="managementUserCollapse">
+              Management User
+            </a>
+            <div class="collapse" id="managementUserCollapse">
+              <ul class="nav flex-column ms-3">
+                <li class="nav-item mb-1">
+                  <%= link_to "Customer Service", customer_services_admin_users_path, class: "nav-link" %>
+                </li>
+                <li class="nav-item mb-1">
+                  <%= link_to "Staff Cabang", staffs_admin_users_path, class: "nav-link" %>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <% elsif current_user&.customer_service? %>
+          <li class="nav-item mb-2">
+            <%= link_to "Tambah Booking", new_cs_bookings_path, class: "nav-link" %>
+          </li>
+          <li class="nav-item mb-2">
+            <%= link_to "Booking Hari Ini", bookings_path, class: "nav-link" %>
+          </li>
+          <% elsif current_user&.staff_cabang? %>
+          <li class="nav-item mb-2">
+            <%= link_to "Jadwal Hari Ini", today_staff_bookings_path, class: "nav-link" %>
+          </li>
+          <li class="nav-item mb-2">
+            <%= link_to "Semua Jadwal", all_staff_bookings_path, class: "nav-link" %>
+          </li>
+          <li class="nav-item mb-2">
+            <%= link_to "Tambah Booking", new_staff_booking_path, class: "nav-link" %>
+          </li>
+          <li class="nav-item mb-2">
+            <%= link_to "Time Table 7 Hari", timetable_staff_bookings_path, class: "nav-link" %>
+          </li>
+          <% end %>
+        </ul>
+        <div class="mt-auto">
+          <!-- Opsional: Area untuk info tambahan atau link footer -->
+        </div>
+      </aside>
+      
+      <!-- Main Content -->
+      <main class="col-md-10 p-4">
+        <% if notice %>
+        <div class="alert alert-success"><%= notice %></div>
+        <% end %>
+        <% if alert %>
+        <div class="alert alert-danger"><%= alert %></div>
+        <% end %>
+        <%= yield %>
+      </main>
+    </div>
+  </div>
+  
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+  <%= javascript_include_tag "application", "data-turbo-track": "reload" %>
+</body>
+</html>

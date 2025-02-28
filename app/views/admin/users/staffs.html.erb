@@ -1,0 +1,26 @@
+<h1>Management Staff Cabang</h1>
+<%= link_to "Tambah Staff Cabang", new_staff_admin_users_path, class: "btn btn-success mb-3" %>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Nama</th>
+      <th>Cabang</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @users.each do |user| %>
+      <tr>
+        <td><%= user.email %></td>
+        <td><%= user.name %></td>
+        <td><%= user.branch.name if user.branch %></td>
+        <td>
+          <%= link_to "Edit", edit_admin_user_path(user), class: "btn btn-warning btn-sm" %>
+          <%= link_to "Hapus", admin_user_path(user), method: :delete, data: { confirm: "Anda yakin?" }, class: "btn btn-danger btn-sm" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

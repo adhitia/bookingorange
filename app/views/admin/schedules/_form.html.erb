@@ -1,0 +1,41 @@
+<%= form_with(model: [:admin, schedule], local: true) do |form| %>
+  <% if schedule.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(schedule.errors.count, "error") %> terjadi:</h4>
+      <ul>
+        <% schedule.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :doctor_id, "Dokter", class: "form-label" %>
+    <%= form.collection_select :doctor_id, Doctor.all, :id, :name, { prompt: "Pilih Dokter" }, { class: "form-select" } %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :branch_id, "Cabang", class: "form-label" %>
+    <%= form.collection_select :branch_id, Branch.all, :id, :name, { prompt: "Pilih Cabang" }, { class: "form-select" } %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :day, "Hari", class: "form-label" %>
+    <%= form.select :day, options_for_select(["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"], schedule.day), { prompt: "Pilih Hari" }, { class: "form-select" } %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :start_time, "Jam Mulai", class: "form-label" %>
+    <%= form.time_field :start_time, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :end_time, "Jam Selesai", class: "form-label" %>
+    <%= form.time_field :end_time, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.submit "Simpan Jadwal", class: "btn btn-primary" %>
+  </div>
+<% end %>

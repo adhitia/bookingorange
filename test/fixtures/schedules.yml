@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  branch: one
+  doctor: one
+  date: 2025-02-23
+  start_time: 2025-02-23 21:25:59
+  end_time: 2025-02-23 21:25:59
+
+two:
+  branch: two
+  doctor: two
+  date: 2025-02-23
+  start_time: 2025-02-23 21:25:59
+  end_time: 2025-02-23 21:25:59

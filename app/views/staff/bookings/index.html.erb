@@ -1,0 +1,35 @@
+<h1>Daftar Booking Cabang Anda</h1>
+<%= link_to "Tambah Booking", new_staff_booking_path, class: "btn btn-success mb-3" %>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Tanggal Booking</th>
+      <th>Dokter</th>
+      <th>Jadwal</th>
+      <th>Customer</th>
+      <th>Status</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @bookings.each do |booking| %>
+      <tr>
+        <td><%= booking.id %></td>
+        <td><%= booking.branch.name %></td>
+        <td><%= booking.booking_date.strftime("%d-%m-%Y") if booking.booking_date %></td>
+        <td><%= booking.booking_time.strftime("%H:%M") if booking.booking_time %></td>
+        <td><%= booking.doctor.name %></td>
+        <td><%= booking.customer_name %></td>
+        <td><%= booking.status.titleize %></td>
+        <td>
+          <%= link_to "Show", staff_booking_path(booking), class: "btn btn-sm btn-info" %>
+          <%= link_to "Edit/Reschedule", edit_staff_booking_path(booking), class: "btn btn-sm btn-warning" %>
+          <%= button_to "Cancel", cancel_staff_booking_path(booking), method: :patch, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-danger" %>
+          <%= button_to "Complete", complete_staff_booking_path(booking), method: :patch, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-success" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

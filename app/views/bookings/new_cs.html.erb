@@ -1,0 +1,58 @@
+<h1>Booking (Customer Service)</h1>
+
+<!-- Form Filter: Hanya untuk memilih Cabang & Tanggal -->
+<%= form_with url: new_cs_bookings_path, method: :get, local: true do %>
+  <div class="mb-3">
+    <%= label_tag :branch_id, "Cabang", class: "form-label" %>
+    <%= select_tag :branch_id, options_from_collection_for_select(@branches, :id, :name, params[:branch_id]),
+          prompt: "Pilih Cabang", class: "form-select" %>
+  </div>
+
+  <div class="mb-3">
+    <%= label_tag :date, "Tanggal", class: "form-label" %>
+    <%= date_field_tag :date, params[:date], class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= submit_tag "Filter Jadwal", class: "btn btn-primary" %>
+  </div>
+<% end %>
+
+<%# Jika cabang dan tanggal sudah dipilih, tampilkan form booking final %>
+<% if @selected_branch && @selected_date %>
+  <h2>Jadwal Tersedia untuk <%= @selected_branch.name %> pada <%= @selected_date.strftime("%d-%m-%Y") %></h2>
+
+  <%= form_with url: create_cs_bookings_path, method: :post, local: true do |f| %>
+    <!-- Hidden field untuk menyimpan cabang dan tanggal booking -->
+    <%= hidden_field_tag "booking[branch_id]", @selected_branch.id %>
+    <%= hidden_field_tag "booking[booking_date]", @selected_date %>
+
+    <div class="mb-3">
+      <%= f.label :slot_combined, "Pilih Slot", class: "form-label" %>
+      <select name="booking[slot_combined]" class="form-select">
+        <option value="">Pilih Slot</option>
+        <% @available_slots.each do |slot| %>
+          <% schedule = slot[:schedule] %>
+          <% slot_time = slot[:slot_time] %>
+          <option value="<%= "#{schedule.id}|#{slot_time.strftime('%H:%M')}" %>">
+            <%= "#{schedule.doctor.name}: #{slot_time.strftime('%H:%M')} - #{(slot_time + 1.hour).strftime('%H:%M')}" %>
+          </option>
+        <% end %>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :customer_name, "Nama Customer", class: "form-label" %>
+      <%= f.text_field :customer_name, class: "form-control" %>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :customer_phone, "Telepon Customer", class: "form-label" %>
+      <%= f.text_field :customer_phone, class: "form-control" %>
+    </div>
+
+    <div class="d-grid">
+      <%= f.submit "Buat Booking", class: "btn btn-success" %>
+    </div>
+  <% end %>
+<% end %>
