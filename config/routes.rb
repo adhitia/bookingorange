@@ -20,7 +20,11 @@ Rails.application.routes.draw do
 
   # Namespace admin untuk input data cabang, dokter, dan schedule
   namespace :admin do
-    resources :branches
+    resources :branches do 
+      member do
+        get :timetable
+      end
+    end
     resources :doctors
     resources :schedules
     resources :bookings

@@ -41,6 +41,40 @@ class Admin::BranchesController < ApplicationController
     redirect_to admin_branches_path
   end
 
+  def timetable
+    @branch = Branch.find(params[:id])
+    
+    # Tentukan rentang waktu kalender untuk tampilan timetable.
+    # Misal, dari 08:00 sampai 20:00, setiap 30 menit.
+    start_display = Time.zone.parse("2000-01-01 10:00")
+    end_display   = Time.zone.parse("2000-01-01 20:00")
+    @time_slots = []
+    current = start_display
+    while current <= end_display
+      @time_slots << current.strftime("%H:%M")
+      current += 30.minutes
+    end
+  
+    # Daftar hari dalam seminggu
+    @week_days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
+  
+    # Buat lookup hash untuk semua slot dalam jadwal praktik di cabang ini.
+    # Key-nya: [hari, "HH:MM"], value-nya adalah schedule.
+    @schedule_lookup = {}
+    @branch.schedules.includes(:doctor).each do |s|
+      # Ambil waktu mulai dan akhir schedule sebagai objek waktu dengan tanggal dummy
+      sched_start = Time.zone.parse("2000-01-01 #{s.start_time.strftime('%H:%M')}")
+      sched_end   = Time.zone.parse("2000-01-01 #{s.end_time.strftime('%H:%M')}")
+      slot_time = sched_start
+      # Selama slot_time kurang dari sched_end (asumsikan slot harus dimulai sebelum akhir jadwal)
+      while slot_time < sched_end
+        key = [s.day, slot_time.strftime("%H:%M")]
+        @schedule_lookup[key] = s
+        slot_time += 30.minutes
+      end
+    end
+  end
+
   private
 
   def set_branch

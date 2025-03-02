@@ -1,0 +1,31 @@
+<h1>Time Table Jadwal Cabang <%= @branch.name %></h1>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th style="width: 80px;">Waktu</th>
+      <% @week_days.each do |day| %>
+        <th><%= day %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody>
+    <% @time_slots.each do |slot| %>
+      <tr>
+        <td><strong><%= slot %></strong></td>
+        <% @week_days.each do |day| %>
+          <% key = [day, slot] %>
+          <td style="vertical-align: middle; text-align: center; background-color: <%= @schedule_lookup[key] ? '#F07C00' : '#F2F2F2' %>;">
+            <% if @schedule_lookup[key] %>
+              <%= @schedule_lookup[key].doctor.name %>
+            <% else %>
+              <em>No Doctor</em>
+            <% end %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to "Kembali ke Daftar Cabang", admin_branches_path, class: "btn btn-secondary" %>
