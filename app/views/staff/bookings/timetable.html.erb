@@ -45,7 +45,7 @@
                 <% end %>
               <% else %>
                 <!-- Jika slot kosong dan ada jadwal dokter, klik untuk membuat booking baru -->
-                <%= link_to new_cs_staff_bookings_path(booking_date: date, booking_time: slot), class: "d-block text-decoration-none" do %>
+                <%= link_to new_cs_staff_bookings_path(date: date, booking_time: slot), class: "d-block text-decoration-none" do %>
                   <span style="opacity: 0.3;"><%= slot %></span>
                 <% end %>
               <% end %>
