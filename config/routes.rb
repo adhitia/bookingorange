@@ -43,11 +43,11 @@ Rails.application.routes.draw do
   namespace :staff do
     resources :bookings do
       collection do
+        post 'cs_create', action: :create_cs
         get :available_slots
         get :today   # Booking untuk tanggal hari ini
         get :all     # Semua booking dengan filter
         get  :new_cs   # Form pembuatan booking customer service
-        post :create_cs # Proses pembuatan booking customer service
         get :timetable  
       end
       member do
