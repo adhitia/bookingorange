@@ -53,6 +53,7 @@ Rails.application.routes.draw do
       member do
         patch :cancel    # Untuk membatalkan booking
         patch :complete  # Untuk menandai booking sebagai complete
+        patch :confirm
       end
     end
   end

@@ -1,4 +1,17 @@
-<h1>Time Table Jadwal Cabang <%= @branch.name %></h1>
+<h1>Time Table Jadwal Cabang</h1>
+
+<!-- Form Filter Cabang -->
+<%= form_with url: timetable_admin_branch_path, method: :get, local: true do %>
+  <div class="mb-3">
+    <%= select_tag :branch_id, options_from_collection_for_select(Branch.all, :id, :name, params[:branch_id]),
+          prompt: "Pilih Cabang", class: "form-control selectpicker", data: { live_search: true } %>
+  </div>
+  <div class="mb-3">
+    <%= submit_tag "OK", class: "btn btn-primary" %>
+  </div>
+<% end %>
+
+<h2>Cabang: <%= @branch.name %></h2>
 
 <table class="table table-bordered">
   <thead>
@@ -15,9 +28,12 @@
         <td><strong><%= slot %></strong></td>
         <% @week_days.each do |day| %>
           <% key = [day, slot] %>
-          <td style="vertical-align: middle; text-align: center; background-color: <%= @schedule_lookup[key] ? '#F07C00' : '#F2F2F2' %>;">
-            <% if @schedule_lookup[key] %>
-              <%= @schedule_lookup[key].doctor.name %>
+          <td style="vertical-align: middle; text-align: center; background-color: <%= @schedule_lookup[key].present? ? '#F07C00' : '#F2F2F2' %>;">
+            <% if @schedule_lookup[key].present? %>
+              <% # Jika ada jadwal, tampilkan nama dokter untuk setiap jadwal dalam slot tersebut %>
+              <% @schedule_lookup[key].each do |schedule| %>
+                <div><%= schedule.doctor.name %></div>
+              <% end %>
             <% else %>
               <em>No Doctor</em>
             <% end %>

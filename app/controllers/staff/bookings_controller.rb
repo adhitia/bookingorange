@@ -1,7 +1,7 @@
 class Staff::BookingsController < ApplicationController
     before_action :authenticate_user!
     before_action :authorize_staff
-    before_action :set_booking, only: [:show, :edit, :update, :cancel, :complete]
+    before_action :set_booking, only: [:show, :edit, :update, :cancel, :complete, :confirm]
     
     def index
         # Hanya tampilkan booking dari cabang staff
@@ -17,51 +17,51 @@ class Staff::BookingsController < ApplicationController
         @booking.created_by = current_user
         @booking.booking_date = params[:booking_date] ? Date.parse(params[:booking_date]) : Date.today
         if params[:booking_time].present?
-          # Misalnya, kita menyimpan booking_time sebagai waktu (dalam zona waktu aplikasi)
-          @booking.booking_time = Time.zone.parse("#{Date.today} #{params[:booking_time]}")
-          # Perlu disesuaikan agar tanggalnya sesuai dengan booking_date yang diinginkan
-          @booking.booking_time = Time.zone.parse("#{@booking.booking_date} #{params[:booking_time]}")
+            # Misalnya, kita menyimpan booking_time sebagai waktu (dalam zona waktu aplikasi)
+            @booking.booking_time = Time.zone.parse("#{Date.today} #{params[:booking_time]}")
+            # Perlu disesuaikan agar tanggalnya sesuai dengan booking_date yang diinginkan
+            @booking.booking_time = Time.zone.parse("#{@booking.booking_date} #{params[:booking_time]}")
         end
-      end
-      
+    end
+    
     def show
     end
     
-
+    
     def create
         @booking = Booking.new(booking_params)
         @booking.branch = current_user.branch
         @booking.created_by = current_user
-      
+        
         # Coba temukan schedule yang sesuai berdasarkan booking_date dan booking_time
         day_name = convert_to_indonesian(@booking.booking_date.strftime("%A"))
         # Cari schedule di cabang staff dengan hari yang sesuai
         matching_schedule = current_user.branch.schedules.find do |s|
-          # Perbandingan berdasarkan string "HH:MM"
-          slot = @booking.booking_time.strftime("%H:%M")
-          start_slot = s.start_time.strftime("%H:%M")
-          end_slot = s.end_time.strftime("%H:%M")
-          slot >= start_slot && slot < end_slot
+            # Perbandingan berdasarkan string "HH:MM"
+            slot = @booking.booking_time.strftime("%H:%M")
+            start_slot = s.start_time.strftime("%H:%M")
+            end_slot = s.end_time.strftime("%H:%M")
+            slot >= start_slot && slot < end_slot
         end
-      
+        
         if matching_schedule
-          @booking.schedule = matching_schedule
-          @booking.doctor = matching_schedule.doctor
+            @booking.schedule = matching_schedule
+            @booking.doctor = matching_schedule.doctor
         else
-          @booking.errors.add(:base, "Tidak ada jadwal yang sesuai untuk waktu yang dipilih")
-          flash.now[:alert] = "Gagal membuat booking. " + @booking.errors.full_messages.join(", ")
-          render :new and return
+            @booking.errors.add(:base, "Tidak ada jadwal yang sesuai untuk waktu yang dipilih")
+            flash.now[:alert] = "Gagal membuat booking. " + @booking.errors.full_messages.join(", ")
+            render :new and return
         end
-      
+        
         if @booking.save
-          flash[:notice] = "Booking berhasil dibuat."
-          redirect_to timetable_staff_bookings_path
+            flash[:notice] = "Booking berhasil dibuat."
+            redirect_to timetable_staff_bookings_path
         else
-          flash.now[:alert] = "Gagal membuat booking."
-          render :new
+            flash.now[:alert] = "Gagal membuat booking."
+            render :new
         end
-      end
-
+    end
+    
     def today
         @bookings = Booking.where(branch_id: current_user.branch_id)
         .where(booking_date: Date.today)
@@ -111,6 +111,19 @@ class Staff::BookingsController < ApplicationController
             @available_slots = []  # pastikan variabel ini selalu ada
         end
         @booking = Booking.new
+    end
+    
+    # Action untuk mengonfirmasi booking
+    def confirm
+        if @booking.update(status: "confirmed")
+            # Opsional: Kirim notifikasi WhatsApp
+            CekatApi.confirm_book(@booking)
+            flash[:notice] = "Booking berhasil dikonfirmasi dan notifikasi WhatsApp telah dikirim."
+            redirect_to staff_booking_path(@booking)
+        else
+            flash[:alert] = "Gagal mengonfirmasi booking."
+            redirect_to staff_booking_path(@booking)
+        end
     end
     
     
@@ -232,30 +245,30 @@ class Staff::BookingsController < ApplicationController
             format.js   # akan merender file available_slots.js.erb
         end
     end
-
+    
     def timetable
         # Ambil tanggal dari hari ini sampai 6 hari ke depan (total 7 hari)
         @dates = (Date.today..(Date.today + 6)).to_a
-    
+        
         # Definisikan time slot tiap 30 menit dari pukul 10:00 sampai 20:00
         start_time = Time.zone.parse("#{Date.today} 10:00")
         end_time   = Time.zone.parse("#{Date.today} 20:00")
         @time_slots = []
         while start_time < end_time
-          @time_slots << start_time.strftime("%H:%M")
-          start_time += 30.minutes
+            @time_slots << start_time.strftime("%H:%M")
+            start_time += 30.minutes
         end
-    
+        
         # Ambil semua booking untuk branch staff dalam rentang tanggal tersebut
         @bookings = Booking.where(branch_id: current_user.branch_id, booking_date: Date.today..(Date.today + 6))
         
         # Buat lookup hash dengan key: [booking_date, booking_time_str]
         @booking_lookup = {}
         @bookings.each do |booking|
-          key = [booking.booking_date, booking.booking_time.strftime("%H:%M")]
-          @booking_lookup[key] = booking
+            key = [booking.booking_date, booking.booking_time.strftime("%H:%M")]
+            @booking_lookup[key] = booking
         end
-      end   
+    end   
     
     private
     

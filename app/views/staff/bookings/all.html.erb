@@ -43,10 +43,16 @@
         </td>
         <td><%= booking.status.titleize %></td>
         <td>
-          <%#= link_to "Show", staff_booking_path(booking), class: "btn btn-sm btn-info" %>
-          <%= link_to "Edit", edit_staff_booking_path(booking), class: "btn btn-sm btn-warning" %>
-          <%= button_to "Cancel", cancel_staff_booking_path(booking), method: :patch, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-danger" %>
-          <%= button_to "Complete", complete_staff_booking_path(booking), method: :patch, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-success" %>
+          <%# Jika booking sudah complete atau dibatalkan, tidak tampilkan tombol aksi apa pun %>
+          <% unless booking.complete? || booking.canceled? %>
+            <%= link_to "Edit", edit_staff_booking_path(booking), class: "btn btn-sm btn-warning" %>
+            <%= button_to "Cancel", cancel_staff_booking_path(booking), method: :patch, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-danger" %>
+            <% if booking.confirmed? %>
+              <%= button_to "Complete", complete_staff_booking_path(booking), method: :patch, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-success" %>
+            <% else %>
+              <%= button_to "Konfirmasi Booking", confirm_staff_booking_path(booking), method: :patch, data: { confirm: "Anda yakin ingin mengonfirmasi booking ini?" }, class: "btn btn-success" %>
+            <% end %>
+          <% end %>
         </td>
       </tr>
     <% end %>

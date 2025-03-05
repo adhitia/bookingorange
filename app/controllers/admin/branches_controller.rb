@@ -42,38 +42,42 @@ class Admin::BranchesController < ApplicationController
   end
 
   def timetable
-    @branch = Branch.find(params[:id])
-    
-    # Tentukan rentang waktu kalender untuk tampilan timetable.
-    # Misal, dari 08:00 sampai 20:00, setiap 30 menit.
-    start_display = Time.zone.parse("2000-01-01 10:00")
+    if params[:branch_id].present?
+      @branch = Branch.find(params[:branch_id])
+    else
+      @branch = Branch.first
+    end
+
+    # Rentang waktu tampilan, misalnya 08:00 sampai 20:00 tiap 30 menit
+    start_display = Time.zone.parse("2000-01-01 08:00")
     end_display   = Time.zone.parse("2000-01-01 20:00")
     @time_slots = []
     current = start_display
-    while current <= end_display
+    while current < end_display
       @time_slots << current.strftime("%H:%M")
       current += 30.minutes
     end
-  
-    # Daftar hari dalam seminggu
+
+    # Hari dalam seminggu (dalam Bahasa Indonesia)
     @week_days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
-  
-    # Buat lookup hash untuk semua slot dalam jadwal praktik di cabang ini.
-    # Key-nya: [hari, "HH:MM"], value-nya adalah schedule.
+
+    # Buat lookup jadwal untuk setiap slot dalam rentang setiap hari
+    # (Menampilkan semua schedule untuk cabang tersebut; jika satu slot memiliki lebih dari satu jadwal, simpan dalam array)
     @schedule_lookup = {}
     @branch.schedules.includes(:doctor).each do |s|
-      # Ambil waktu mulai dan akhir schedule sebagai objek waktu dengan tanggal dummy
+      # Ubah waktu mulai dan akhir schedule menjadi objek Time dengan tanggal dummy "2000-01-01"
       sched_start = Time.zone.parse("2000-01-01 #{s.start_time.strftime('%H:%M')}")
       sched_end   = Time.zone.parse("2000-01-01 #{s.end_time.strftime('%H:%M')}")
-      slot_time = sched_start
-      # Selama slot_time kurang dari sched_end (asumsikan slot harus dimulai sebelum akhir jadwal)
-      while slot_time < sched_end
-        key = [s.day, slot_time.strftime("%H:%M")]
-        @schedule_lookup[key] = s
-        slot_time += 30.minutes
+      current_slot = sched_start
+      while current_slot < sched_end
+        key = [s.day, current_slot.strftime("%H:%M")]
+        @schedule_lookup[key] ||= []
+        @schedule_lookup[key] << s
+        current_slot += 30.minutes
       end
     end
   end
+  
 
   private
 

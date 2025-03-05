@@ -35,7 +35,7 @@
           <% schedule = slot[:schedule] %>
           <% slot_time = slot[:slot_time] %>
           <option value="<%= "#{schedule.id}|#{slot_time.strftime('%H:%M')}" %>">
-            <%= "#{schedule.doctor.name}: #{slot_time.strftime('%H:%M')} - #{(slot_time + 1.hour).strftime('%H:%M')}" %>
+            <%= "#{schedule.doctor.name}: #{slot_time.strftime('%H:%M')} - #{(slot_time + 30.minute).strftime('%H:%M')}" %>
           </option>
         <% end %>
       </select>
