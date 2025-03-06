@@ -1,0 +1,17 @@
+<%# Menghitung jumlah booking yang belum dikonfirmasi untuk branch staff saat ini %>
+<% pending_count = Booking.where(branch: current_user.branch).where(status: ["scheduled", "rescheduled"]).count %>
+<% if pending_count > 0 %>
+  <div id="pending-notification" style="position: fixed; top: 10px; right: 200px; z-index: 1000;">
+    <a href="<%= staff_bookings_path %>" style="color: red; text-decoration: none;">
+      <i class="fa fa-bell" style="font-size: 24px;"></i>
+      <span class="badge badge-danger" style="background: red; color: white; padding: 2px 5px; border-radius: 50%;"> <%= pending_count %> </span>
+    </a>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Menampilkan popup notifikasi; ganti alert dengan modal jika diinginkan
+      alert("Ada " + <%= pending_count %> + " booking yang belum dikonfirmasi!");
+    });
+  </script>
+<% end %>
