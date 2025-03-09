@@ -39,22 +39,31 @@ class BookingsController < ApplicationController
     if params[:branch_id].present? && params[:date].present?
       @selected_branch = Branch.find(params[:branch_id])
       @selected_date = Date.parse(params[:date])
-      # Konversi nama hari dari tanggal ke bahasa Indonesia
+      # Konversi nama hari ke Bahasa Indonesia
       day_name = convert_to_indonesian(@selected_date.strftime("%A"))
       
       # Ambil semua jadwal rutin untuk cabang dan hari tersebut
       schedules = @selected_branch.schedules.where(day: day_name)
       
       @available_slots = []
-      booking_duration = 30.minute  # Durasi booking 1 jam
+      # Durasi default booking adalah 30 menit
+      booking_duration = 30.minutes
       schedules.each do |schedule|
         slot_time = schedule.start_time
-        # Generate slot selama slot_time + booking_duration tidak melebihi end_time
         while slot_time + booking_duration <= schedule.end_time
-          # Cek apakah untuk schedule ini, pada tanggal dan waktu slot tersebut sudah ada booking
-          unless Booking.exists?(schedule_id: schedule.id, booking_date: @selected_date, booking_time: slot_time)
+          candidate_start = slot_time
+          candidate_end   = slot_time + booking_duration
+  
+          # Cek apakah ada booking yang tumpang tindih dengan interval kandidat,
+          # kecuali booking yang telah dibatalkan (status: canceled).
+          conflict = Booking.where(schedule_id: schedule.id, booking_date: @selected_date)
+                            .where.not(status: 'canceled')
+                            .where("booking_time < ? AND booking_end_time > ?", candidate_end, candidate_start)
+                            .exists?
+          unless conflict
             @available_slots << { schedule: schedule, slot_time: slot_time }
           end
+  
           slot_time += booking_duration
         end
       end
@@ -64,28 +73,42 @@ class BookingsController < ApplicationController
     @booking = Booking.new
   end
   
+  
 
   # Proses pembuatan booking oleh Customer Service
   def create_cs
-    bp = booking_params
-    slot_combined = bp.delete(:slot_combined)
+    debugger
+    bp = booking_params.except(:slot_combined)
+    slot_combined = booking_params[:slot_combined]
+  
     @booking = Booking.new(bp)
-    
+    # Misalnya, untuk CS, cabang diambil dari form (atau bisa juga otomatis)
+    @booking.branch = Branch.find(booking_params[:branch_id]) if booking_params[:branch_id].present?
+    @booking.created_by = current_user
+  
     if slot_combined.present?
       schedule_id, slot_str = slot_combined.split("|")
       schedule = Schedule.find(schedule_id)
       @booking.schedule = schedule
-      @booking.booking_time = Time.parse(slot_str)
-      # Assign dokter berdasarkan schedule yang dipilih
+      @booking.booking_time = Time.zone.parse(slot_str)
       @booking.doctor = schedule.doctor
-      @booking.customer_name = params[:customer_name]
-      @booking.customer_phone = params[:customer_phone] 
+    else
+      @booking.errors.add(:base, "Slot harus dipilih")
+      render :new_cs and return
     end
-    @booking.created_by = current_user
-    @booking.status = 0  # Status scheduled
+  
+    # Set default booking_end_time: jika tidak diisi, set menjadi booking_time + 30 menit
+    if booking_params[:booking_end_time].blank?
+      @booking.booking_end_time = @booking.booking_time + 30.minutes
+    else
+      @booking.booking_end_time = Time.zone.parse(booking_params[:booking_end_time])
+    end
+    
+    @booking.status = :scheduled
+
     if @booking.save
       flash[:notice] = "Booking berhasil dibuat."
-      redirect_to bookings_path
+      redirect_to booking_path(@booking)
     else
       flash.now[:alert] = "Gagal membuat booking."
       new_cs
@@ -98,7 +121,7 @@ class BookingsController < ApplicationController
   private
 
   def booking_params
-    params.require(:booking).permit(:branch_id, :booking_date, :customer_name, :customer_phone, :slot_combined)
+    params.require(:booking).permit(:branch_id, :booking_date, :booking_time, :booking_end_time, :customer_name, :customer_phone, :slot_combined, :keterangan)
   end
 
   # Konversi nama hari dari bahasa Inggris ke Bahasa Indonesia

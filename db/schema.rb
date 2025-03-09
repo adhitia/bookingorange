@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_02_28_164937) do
+ActiveRecord::Schema[7.1].define(version: 2025_03_09_165945) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -26,6 +26,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_28_164937) do
     t.datetime "updated_at", null: false
     t.date "booking_date"
     t.time "booking_time"
+    t.time "booking_end_time"
+    t.string "keterangan"
     t.index ["branch_id"], name: "index_bookings_on_branch_id"
     t.index ["created_by_id"], name: "index_bookings_on_created_by_id"
     t.index ["doctor_id"], name: "index_bookings_on_doctor_id"

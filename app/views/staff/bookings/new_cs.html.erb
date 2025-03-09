@@ -1,9 +1,11 @@
 <h1>Booking Langsung Staff Cabang</h1>
 
-<!-- Form Filter: Hanya untuk memilih Cabang & Tanggal -->
+<!-- Form Filter: Hanya untuk memilih Tanggal (Cabang sudah tetap) -->
 <%= form_with url: new_cs_staff_bookings_path, method: :get, local: true do %>
   <div class="mb-3">
     <%= label_tag :branch_id, "Cabang", class: "form-label" %>
+    <!-- Karena cabang sudah tetap, tampilkan nama cabang saja -->
+    <p class="form-control-plaintext"><%= @selected_branch ? @selected_branch.name : "Cabang Anda" %></p>
   </div>
 
   <div class="mb-3">
@@ -16,27 +18,31 @@
   </div>
 <% end %>
 
-<%# Jika cabang dan tanggal sudah dipilih, tampilkan form booking final %>
 <% if @selected_branch && @selected_date %>
   <h2>Jadwal Tersedia untuk <%= @selected_branch.name %> pada <%= @selected_date.strftime("%d-%m-%Y") %></h2>
 
-  <%= form_with url: create_cs_bookings_path, method: :post, local: true do |f| %>
-    <!-- Hidden field untuk menyimpan cabang dan tanggal booking -->
-    <%= hidden_field_tag "booking[branch_id]", @selected_branch.id %>
-    <%= hidden_field_tag "booking[booking_date]", @selected_date %>
+  <%= form_with model: @booking, url: cs_create_staff_bookings_path, method: :post, local: true do |f| %>
+    <!-- Semua field harus berada di dalam form builder -->
+    <%= f.hidden_field :branch_id, value: @selected_branch.id %>
+    <%= f.hidden_field :booking_date, value: @selected_date %>
 
     <div class="mb-3">
-      <%= f.label :slot_combined, "Pilih Slot", class: "form-label" %>
-      <select name="booking[slot_combined]" class="form-select">
-        <option value="">Pilih Slot</option>
-        <% @available_slots.each do |slot| %>
-          <% schedule = slot[:schedule] %>
-          <% slot_time = slot[:slot_time] %>
-          <option value="<%= "#{schedule.id}|#{slot_time.strftime('%H:%M')}" %>">
-            <%= "#{schedule.doctor.name}: #{slot_time.strftime('%H:%M')} - #{(slot_time + 30.minute).strftime('%H:%M')}" %>
-          </option>
-        <% end %>
-      </select>
+      <%= f.label :slot_combined, "Pilih Slot (Waktu Mulai)", class: "form-label" %>
+      <%= f.select :slot_combined,
+            options_for_select(@available_slots.map do |slot|
+              schedule = slot[:schedule]
+              slot_time = slot[:slot_time]
+              display_text = "#{schedule.doctor.name}: #{slot_time.strftime('%H:%M')} - #{(slot_time + 30.minutes).strftime('%H:%M')}"
+              value = "#{schedule.id}|#{slot_time.strftime('%H:%M')}"
+              [display_text, value]
+            end),
+            { prompt: "Pilih Slot" },
+            class: "form-select" %>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :booking_end_time, "Waktu Selesai", class: "form-label" %>
+      <%= f.time_field :booking_end_time, class: "form-control" %>
     </div>
 
     <div class="mb-3">

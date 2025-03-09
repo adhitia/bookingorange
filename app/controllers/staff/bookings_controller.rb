@@ -127,31 +127,49 @@ class Staff::BookingsController < ApplicationController
     end
     
     
-    # Proses pembuatan booking oleh Customer Service
     def create_cs
-        bp = booking_params
-        slot_combined = bp.delete(:slot_combined)
+        # Buat salinan parameter dan hapus slot_combined dari hash
+        bp = booking_params.except(:slot_combined)
+        slot_combined = booking_params[:slot_combined]
+        
         @booking = Booking.new(bp)
+        @booking.branch = current_user.branch
+        @booking.created_by = current_user
+        @booking.status = :confirmed
+
+        # Proses slot_combined untuk menentukan schedule, booking_time, dll.
         if slot_combined.present?
             schedule_id, slot_str = slot_combined.split("|")
             schedule = Schedule.find(schedule_id)
             @booking.schedule = schedule
-            @booking.booking_time = Time.parse(slot_str)
+            @booking.booking_time = Time.zone.parse(slot_str)
             @booking.doctor = schedule.doctor
+        else
+            @booking.errors.add(:base, "Slot harus dipilih")
+            render :new and return
         end
-        @booking.branch = current_user.branch
-        @booking.created_by = current_user
+        
+        # Validasi end time jika diberikan
+        if @booking.booking_time.present? && booking_params[:booking_end_time].present?
+            end_time = Time.zone.parse(booking_params[:booking_end_time])
+            if end_time <= @booking.booking_time
+                @booking.errors.add(:booking_end_time, "harus lebih besar dari waktu mulai")
+                render :new and return
+            else
+                @booking.booking_end_time = end_time
+            end
+        else
+            @booking.errors.add(:booking_end_time, "harus diisi")
+            render :new and return
+        end
         if @booking.save
             flash[:notice] = "Booking berhasil dibuat."
             redirect_to staff_booking_path(@booking)
         else
             flash.now[:alert] = "Gagal membuat booking."
-            new_cs  # reload variabel filter
-            render :new_cs
+            render :new
         end
     end
-    
-    
     
     def edit
         # Gunakan booking_date dari booking atau default ke hari ini
@@ -177,27 +195,58 @@ class Staff::BookingsController < ApplicationController
         end
     end
     
+    # Action update (untuk edit/reschedule booking)
     def update
-        bp = booking_params.dup
-        slot_combined = bp.delete(:slot_combined)
+        bp = booking_params.except(:slot_combined)
+        slot_combined = booking_params[:slot_combined]
+      
+        # Jika staff memilih slot baru, proses slot_combined untuk menentukan schedule, booking_time, dan doctor.
         if slot_combined.present?
-            schedule_id, slot_str = slot_combined.split("|")
-            schedule = Schedule.find(schedule_id)
-            bp[:schedule_id] = schedule_id
-            bp[:booking_time] = Time.parse(slot_str)
-            bp[:doctor_id] = schedule.doctor_id
+          schedule_id, slot_str = slot_combined.split("|")
+          schedule = Schedule.find(schedule_id)
+          bp[:schedule_id] = schedule_id
+          bp[:booking_time] = Time.zone.parse(slot_str)
+          bp[:doctor_id] = schedule.doctor_id
         end
-        
-        if @booking.update(bp)
-            # Jika update berhasil, ubah status menjadi rescheduled
-            @booking.update(status: :rescheduled)
-            flash[:notice] = "Booking berhasil direschedule."
-            redirect_to staff_booking_path(@booking)
+      
+        # Pastikan booking_end_time sudah diinput dan valid.
+        if bp[:booking_end_time].present?
+          new_end_time = bp[:booking_end_time]
+          # Jika parameter adalah string, parsing; jika sudah Time, gunakan langsung.
+          new_end_time = new_end_time.is_a?(String) ? Time.zone.parse(new_end_time) : new_end_time
         else
-            flash.now[:alert] = "Gagal melakukan reschedule booking."
-            render :edit
+          @booking.errors.add(:booking_end_time, "tidak boleh kosong")
+          load_available_slots(@booking.booking_date)
+          render :edit and return
         end
-    end
+      
+        # Ambil waktu mulai dari parameter jika ada, atau gunakan booking yang sudah ada.
+        new_start_time = if bp[:booking_time].present?
+                           temp = bp[:booking_time]
+                           temp = temp.is_a?(String) ? Time.zone.parse(temp) : temp
+                           temp
+                         else
+                           @booking.booking_time
+                         end
+      
+        if new_end_time <= new_start_time
+          @booking.errors.add(:booking_end_time, "harus lebih besar dari waktu mulai")
+          load_available_slots(@booking.booking_date)
+          render :edit and return
+        end
+      
+        bp[:booking_end_time] = new_end_time
+        if @booking.update(bp)
+          # Ubah status booking ke rescheduled jika ada perubahan jadwal.
+          @booking.update(status: :confirmed)
+          flash[:notice] = "Booking berhasil diupdate."
+          redirect_to staff_booking_path(@booking)
+        else
+          flash.now[:alert] = "Gagal mengupdate booking."
+          load_available_slots(@booking.booking_date)
+          render :edit
+        end
+      end
     
     def cancel
         @booking.status = :canceled
@@ -282,7 +331,7 @@ class Staff::BookingsController < ApplicationController
     end
     
     def booking_params
-        params.require(:booking).permit(:booking_date, :booking_time, :customer_name, :customer_phone)
+        params.require(:booking).permit(:booking_date, :booking_time, :customer_name, :customer_phone, :branch_id, :slot_combined, :booking_end_time, :keterangan)
     end
     
     def authorize_staff

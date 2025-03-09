@@ -24,17 +24,23 @@
 
   <!-- Dropdown Slot, akan diperbarui via Ajax -->
   <div class="mb-3">
-    <label class="form-label">Pilih Slot Baru</label>
-    <select name="booking[slot_combined]" class="form-select" id="available_slots_select">
-      <option value="">Pilih Slot</option>
-      <% (@available_slots || []).each do |slot| %>
-        <% schedule = slot[:schedule] %>
-        <% slot_time = slot[:slot_time] %>
-        <option value="<%= "#{schedule.id}|#{slot_time.strftime('%H:%M')}" %>" <%= "selected" if @booking.schedule_id == schedule.id && @booking.booking_time.strftime('%H:%M') == slot_time.strftime('%H:%M') %>>
-          <%= "#{schedule.doctor.name}: #{slot_time.strftime('%H:%M')} - #{(slot_time + 30.minute).strftime('%H:%M')}" %>
-        </option>
-      <% end %>
-    </select>
+    <%= f.label :slot_combined, "Pilih Slot Baru (Waktu Mulai)", class: "form-label" %>
+    <%= f.select :slot_combined, 
+          options_for_select((@available_slots || []).map do |slot|
+            schedule = slot[:schedule]
+            slot_time = slot[:slot_time]
+            display_text = "#{schedule.doctor.name}: #{slot_time.strftime('%H:%M')} - #{(slot_time + 30.minutes).strftime('%H:%M')}"
+            value = "#{schedule.id}|#{slot_time.strftime('%H:%M')}"
+            [display_text, value]
+          end, "#{@booking.schedule_id}|#{@booking.booking_time.strftime('%H:%M')}"), 
+          { prompt: "Pilih Slot" }, 
+          class: "form-select" %>
+  </div>
+
+  <!-- Field untuk Waktu Selesai -->
+  <div class="mb-3">
+    <%= f.label :booking_end_time, "Waktu Selesai", class: "form-label" %>
+    <%= f.time_field :booking_end_time, class: "form-control" %>
   </div>
 
   <!-- Field Data Customer (pre-populated) -->
@@ -46,6 +52,11 @@
   <div class="mb-3">
     <%= f.label :customer_phone, "Telepon Customer", class: "form-label" %>
     <%= f.text_field :customer_phone, class: "form-control", value: @booking.customer_phone %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :keterangan, "Keterangan", class: "form-label" %>
+    <%= f.text_field :keterangan, class: "form-control", value: @booking.keterangan %>
   </div>
 
   <div class="d-grid">

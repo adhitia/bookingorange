@@ -27,6 +27,7 @@
       <th>Waktu Slot</th>
       <th>Dokter</th>
       <th>Customer</th>
+      <th>Keterangan</th>
       <th>Status</th>
       <th>Aksi</th>
     </tr>
@@ -35,12 +36,13 @@
     <% @bookings.each do |booking| %>
       <tr>
         <td><%= booking.booking_date.strftime("%d-%m-%Y") if booking.booking_date %></td>
-        <td><%= booking.booking_time.strftime("%H:%M") if booking.booking_time %></td>
+        <td><%= booking.booking_time.strftime("%H:%M") if booking.booking_time %> - <%= booking.booking_end_time.strftime("%H:%M") if booking.booking_end_time %></td>
         <td><%= booking.doctor.name if booking.doctor %></td>
         <td>
           <%= booking.customer_name %><br>
           <small><%= booking.customer_phone %></small>
         </td>
+        <td><%= booking.keterangan %></td>
         <td><%= booking.status.titleize %></td>
         <td>
           <%# Jika booking sudah complete atau dibatalkan, tidak tampilkan tombol aksi apa pun %>
