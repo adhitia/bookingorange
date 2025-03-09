@@ -77,7 +77,6 @@ class BookingsController < ApplicationController
 
   # Proses pembuatan booking oleh Customer Service
   def create_cs
-    debugger
     bp = booking_params.except(:slot_combined)
     slot_combined = booking_params[:slot_combined]
   
