@@ -30,8 +30,7 @@ module CekatApi
       template_body_variables: [
         booking.customer_name,
         "cabang #{booking.branch.name} pada #{formatted_date}",
-        formatted_time,
-        doctor_name
+        formatted_time
       ],
       inbox_id: "c76d94c4-4de3-4703-ab00-75ac56cee2be",  # Sesuaikan dengan ID inbox yang digunakan
       phone_number: sanitize_phone_number(booking.customer_phone),  # Pastikan sudah dalam format internasional, misal: "628123456789"

@@ -24,7 +24,7 @@ $beige:    #D8CD9C;
 
 // Sidebar
 .sidebar {
-  background-color: $orange-3; 
+  background-color: $orange-3 !important; 
   color: #fff;
   min-height: 100vh; // agar sidebar membentang penuh
   .nav-link {
