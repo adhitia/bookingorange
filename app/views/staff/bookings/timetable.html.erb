@@ -25,9 +25,12 @@
                slot < s.end_time.strftime("%H:%M")
              end
           %>
+          <% slot_plus = (Time.zone.parse(slot) + 30.minutes).strftime("%H:%M") %>
+          <% book_still_exist = @bookings.where(booking_date: date).where("booking_time <= ?",slot ).where("booking_end_time >= ?", slot_plus) %>
+
           <% cell_bg = if matching_schedules.empty?
                         "#F2F2F2"  # Tidak ada jadwal, gunakan warna netral
-                      elsif @booking_lookup[key]
+                      elsif !book_still_exist.blank?
                         "#F07C00"  # Booking sudah ada, gunakan warna oranye
                       else
                         "#D8CD9C45" # Slot kosong, tapi ada jadwal dokter
@@ -37,11 +40,13 @@
             <% if matching_schedules.empty? %>
               <em>No Doctor</em>
             <% else %>
-              <% if @booking_lookup[key] %>
-                <!-- Jika slot sudah terbooking, klik untuk edit booking -->
-                <%= link_to edit_staff_booking_path(@booking_lookup[key]), class: "text-decoration-none text-dark" do %>
-                  <strong><%= @booking_lookup[key].customer_name %></strong><br>
-                  <small><%= @booking_lookup[key].doctor.name %></small>
+              <% if !book_still_exist.blank? %>
+                <% book_still_exist.each do |real_book| %>
+                  <!-- Jika slot sudah terbooking, klik untuk edit booking -->
+                  <%= link_to edit_staff_booking_path(real_book), class: "text-decoration-none text-dark" do %>
+                    <strong><%= real_book.customer_name %></strong><br>
+                    <small><%= real_book.doctor.name %></small><br>
+                  <% end %>
                 <% end %>
               <% else %>
                 <!-- Jika slot kosong dan ada jadwal dokter, klik untuk membuat booking baru -->

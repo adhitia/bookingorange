@@ -101,9 +101,9 @@ class Staff::BookingsController < ApplicationController
                 # Generate slot selama slot_time + booking_duration tidak melebihi end_time
                 while slot_time + booking_duration <= schedule.end_time
                     # Cek apakah untuk schedule ini, pada tanggal dan waktu slot tersebut sudah ada booking
-                    unless Booking.exists?(schedule_id: schedule.id, booking_date: @selected_date, booking_time: slot_time)
+                    # unless Booking.exists?(schedule_id: schedule.id, booking_date: @selected_date, booking_time: slot_time)
                         @available_slots << { schedule: schedule, slot_time: slot_time }
-                    end
+                    # end
                     slot_time += booking_duration
                 end
             end
@@ -148,10 +148,16 @@ class Staff::BookingsController < ApplicationController
             @booking.errors.add(:base, "Slot harus dipilih")
             render :new and return
         end
-        
+
+        if booking_params[:booking_end_time].blank?
+            @booking.booking_end_time = @booking.booking_time + 30.minutes
+        else
+            @booking.booking_end_time = Time.zone.parse(booking_params[:booking_end_time])
+        end
+
         # Validasi end time jika diberikan
-        if @booking.booking_time.present? && booking_params[:booking_end_time].present?
-            end_time = Time.zone.parse(booking_params[:booking_end_time])
+        if @booking.booking_time.present? && @booking.booking_end_time.present?
+            end_time = @booking.booking_end_time
             if end_time <= @booking.booking_time
                 @booking.errors.add(:booking_end_time, "harus lebih besar dari waktu mulai")
                 render :new and return
@@ -239,6 +245,7 @@ class Staff::BookingsController < ApplicationController
         if @booking.update(bp)
           # Ubah status booking ke rescheduled jika ada perubahan jadwal.
           @booking.update(status: :confirmed)
+          CekatApi.confirm_book(@booking)
           flash[:notice] = "Booking berhasil diupdate."
           redirect_to staff_booking_path(@booking)
         else

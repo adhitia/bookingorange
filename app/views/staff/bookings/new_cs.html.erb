@@ -26,6 +26,17 @@
     <%= f.hidden_field :branch_id, value: @selected_branch.id %>
     <%= f.hidden_field :booking_date, value: @selected_date %>
 
+    <%# Cari nilai selected berdasarkan params[:booking_time] jika ada %>
+    <% selected_value = nil %>
+    <% if params[:booking_time].present? %>
+      <% @available_slots.each do |slot| %>
+        <% if slot[:slot_time].strftime('%H:%M') == params[:booking_time] %>
+          <% selected_value = "#{slot[:schedule].id}|#{slot[:slot_time].strftime('%H:%M')}" %>
+          <% break %>
+        <% end %>
+      <% end %>
+    <% end %>
+
     <div class="mb-3">
       <%= f.label :slot_combined, "Pilih Slot (Waktu Mulai)", class: "form-label" %>
       <%= f.select :slot_combined,
@@ -35,7 +46,7 @@
               display_text = "#{schedule.doctor.name}: #{slot_time.strftime('%H:%M')} - #{(slot_time + 30.minutes).strftime('%H:%M')}"
               value = "#{schedule.id}|#{slot_time.strftime('%H:%M')}"
               [display_text, value]
-            end),
+            end, selected_value),
             { prompt: "Pilih Slot" },
             class: "form-select" %>
     </div>
