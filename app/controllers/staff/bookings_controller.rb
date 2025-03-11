@@ -68,22 +68,27 @@ class Staff::BookingsController < ApplicationController
         .order(:booking_time)
     end
     
-    # Semua booking dengan filter (filter: tanggal, dokter, status)
     def all
-        @bookings = Booking.where(branch_id: current_user.branch_id).order(:booking_date, :booking_time)
+        # Ambil semua booking untuk branch staff dengan booking_date >= hari ini
+        @bookings = Booking.where(branch_id: current_user.branch_id)
+                           .where("booking_date >= ?", Date.today)
+                           .order(:booking_date, :booking_time)
         
-        # Filter berdasarkan tanggal jika disediakan
-        @bookings = @bookings.where(booking_date: Date.parse(params[:date])) if params[:date].present?
-        
-        # Filter berdasarkan dokter (doctor_id)
+        # Jika ada parameter :date, filter dengan tanggal spesifik
+        if params[:date].present?
+          @bookings = @bookings.where(booking_date: Date.parse(params[:date]))
+        end
+      
+        # Filter berdasarkan doctor_id jika disediakan
         @bookings = @bookings.where(doctor_id: params[:doctor_id]) if params[:doctor_id].present?
-        
-        # Filter berdasarkan status (misal: scheduled, canceled, rescheduled, complete)
+      
+        # Filter berdasarkan status jika disediakan
         @bookings = @bookings.where(status: params[:status]) if params[:status].present?
-        
+      
         # Untuk dropdown filter dokter
         @doctors = Doctor.where(branch_id: current_user.branch_id)
-    end
+      end
+      
     
     # Form booking untuk Customer Service
     def new_cs
