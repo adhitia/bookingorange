@@ -1,4 +1,4 @@
-<%= form_with(model: branch, local: true) do |f| %>
+<%= form_with(model: [:admin, branch], local: true) do |form| %>
   <% if branch.errors.any? %>
     <div class="alert alert-danger">
       <h4><%= pluralize(branch.errors.count, "error") %> terjadi:</h4>
@@ -11,16 +11,21 @@
   <% end %>
 
   <div class="mb-3">
-    <%= f.label :name, "Nama Cabang", class: "form-label" %>
-    <%= f.text_field :name, class: "form-control" %>
+    <%= form.label :name, "Nama Cabang", class: "form-label" %>
+    <%= form.text_field :name, class: "form-control" %>
   </div>
 
   <div class="mb-3">
-    <%= f.label :phone, "Nomor WA", class: "form-label" %>
-    <%= f.text_field :phone, class: "form-control", placeholder: "62xxxxxxxxxx" %>
+    <%= form.label :location, "Lokasi", class: "form-label" %>
+    <%= form.text_field :location, class: "form-control" %>
   </div>
 
-  <div class="d-grid">
-    <%= f.submit class: "btn btn-primary" %>
+  <div class="mb-3">
+    <%= form.label :phone, "Nomor WA", class: "form-label" %>
+    <%= form.text_field :phone, class: "form-control", placeholder: "62xxxxxxxxxx" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.submit "Simpan Cabang", class: "btn btn-primary" %>
   </div>
 <% end %>
