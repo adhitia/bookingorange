@@ -49,8 +49,8 @@ class Admin::BranchesController < ApplicationController
     end
 
     # Rentang waktu tampilan, misalnya 08:00 sampai 20:00 tiap 30 menit
-    start_display = Time.zone.parse("2000-01-01 08:00")
-    end_display   = Time.zone.parse("2000-01-01 20:00")
+    start_display = Time.zone.parse("2000-01-01 10:00")
+    end_display   = Time.zone.parse("2000-01-01 21:00")
     @time_slots = []
     current = start_display
     while current < end_display
