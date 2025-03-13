@@ -320,8 +320,9 @@ class Staff::BookingsController < ApplicationController
             start_time += 30.minutes
         end
         
-        # Ambil semua booking untuk branch staff dalam rentang tanggal tersebut
+        # Ambil semua booking untuk branch staff dalam rentang tanggal tersebut, kecuali yang dibatalkan
         @bookings = Booking.where(branch_id: current_user.branch_id, booking_date: Date.today..(Date.today + 6))
+                           .where.not(status: 'canceled')
         
         # Buat lookup hash dengan key: [booking_date, booking_time_str]
         @booking_lookup = {}

@@ -25,8 +25,8 @@ Rails.application.routes.draw do
         get :timetable
       end
     end
-    resources :doctors
-    resources :schedules
+    resources :doctors, only: [:index, :new, :create, :edit, :update, :destroy]
+    resources :schedules, only: [:index, :new, :create, :edit, :update, :destroy]
     resources :bookings
     resources :users, only: [:edit, :update, :destroy] do
       collection do
