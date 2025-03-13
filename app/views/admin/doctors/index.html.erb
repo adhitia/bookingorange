@@ -18,7 +18,10 @@
         <td><%= doctor.branch.try(:name) %></td>
         <td>
           <%= link_to "Edit", edit_admin_doctor_path(doctor), class: "btn btn-sm btn-warning" %>
-          <%= link_to "Hapus", admin_doctor_path(doctor), method: :delete, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-danger" %>
+          <%= button_to "Delete", admin_doctor_path(doctor),
+          method: :delete,
+          data: { confirm: "Apakah Anda yakin ingin menghapus dokter ini? Anda harus memilih dokter pengganti untuk jadwal yang sudah ada." },
+          class: "btn btn-sm btn-danger" %>
         </td>
       </tr>
     <% end %>

@@ -1,0 +1,19 @@
+<h1>Hapus Dokter</h1>
+<p>
+  Anda akan menghapus dokter: <strong><%= @doctor.name %></strong>.
+</p>
+<p>
+  Silakan pilih dokter pengganti untuk menerima semua jadwal dan booking dokter ini:
+</p>
+
+<%= form_with url: admin_doctor_path(@doctor), method: :delete, local: true do |f| %>
+  <div class="mb-3">
+    <%= label_tag :fallback_doctor_id, "Dokter Pengganti", class: "form-label" %>
+    <%= select_tag :fallback_doctor_id, options_from_collection_for_select(@fallback_options, :id, :name), prompt: "Pilih Dokter Pengganti", class: "form-select" %>
+  </div>
+  <div class="d-grid">
+    <%= f.submit "Hapus Dokter dan Alihkan Jadwal & Booking", class: "btn btn-danger" %>
+  </div>
+<% end %>
+
+<%= link_to "Batal", admin_doctors_path, class: "btn btn-secondary mt-3" %>

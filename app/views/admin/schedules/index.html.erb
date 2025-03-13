@@ -24,7 +24,7 @@
         <td><%= schedule.end_time.strftime("%H:%M") if schedule.end_time %></td>
         <td>
           <%= link_to "Edit", edit_admin_schedule_path(schedule), class: "btn btn-sm btn-warning" %>
-          <%= link_to "Hapus", admin_schedule_path(schedule), method: :delete, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-danger" %>
+          <%= button_to "Hapus", admin_schedule_path(schedule), method: :delete, data: { confirm: "Anda yakin ingin menghapus jadwal ini?" }, class: "btn btn-sm btn-danger" %>
         </td>
       </tr>
     <% end %>

@@ -36,8 +36,11 @@ class Admin::SchedulesController < ApplicationController
   end
 
   def destroy
-    @schedule.destroy
-    flash[:notice] = "Jadwal berhasil dihapus."
+    if @schedule.destroy
+      flash[:notice] = "Jadwal dokter berhasil dihapus."
+    else
+      flash[:alert] = "Gagal menghapus jadwal dokter."
+    end
     redirect_to admin_schedules_path
   end
 
