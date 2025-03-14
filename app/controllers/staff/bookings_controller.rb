@@ -52,7 +52,7 @@ class Staff::BookingsController < ApplicationController
             flash.now[:alert] = "Gagal membuat booking. " + @booking.errors.full_messages.join(", ")
             render :new and return
         end
-        
+        @booking.status = :confirmed
         if @booking.save
             flash[:notice] = "Booking berhasil dibuat."
             redirect_to timetable_staff_bookings_path
@@ -140,7 +140,6 @@ class Staff::BookingsController < ApplicationController
         @booking = Booking.new(bp)
         @booking.branch = current_user.branch
         @booking.created_by = current_user
-        @booking.status = :confirmed
 
         # Proses slot_combined untuk menentukan schedule, booking_time, dll.
         if slot_combined.present?
@@ -173,6 +172,7 @@ class Staff::BookingsController < ApplicationController
             @booking.errors.add(:booking_end_time, "harus diisi")
             render :new and return
         end
+        @booking.status = :confirmed
         if @booking.save
             CekatApi.confirm_book(@booking)
             flash[:notice] = "Booking berhasil dibuat."
