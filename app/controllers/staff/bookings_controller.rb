@@ -174,6 +174,7 @@ class Staff::BookingsController < ApplicationController
             render :new and return
         end
         if @booking.save
+            CekatApi.confirm_book(@booking)
             flash[:notice] = "Booking berhasil dibuat."
             redirect_to staff_booking_path(@booking)
         else
