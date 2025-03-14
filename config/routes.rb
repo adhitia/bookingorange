@@ -20,6 +20,7 @@ Rails.application.routes.draw do
 
   # Namespace admin untuk input data cabang, dokter, dan schedule
   namespace :admin do
+    get "analytics/bookings", to: "analytics#bookings", as: :analytics_bookings
     resources :branches do 
       member do
         get :timetable

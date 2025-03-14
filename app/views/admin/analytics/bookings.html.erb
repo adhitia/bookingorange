@@ -1,0 +1,52 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Include date adapter for Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+<%= javascript_include_tag "chartkick", "data-turbo-track": "reload" %>
+
+<h1>Analisis Booking Harian</h1>
+
+<%= form_with url: admin_analytics_bookings_path, method: :get, local: true do %>
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <label>Start Date</label>
+      <%= date_field_tag :start_date, @start_date, class: "form-control" %>
+    </div>
+    <div class="col-md-3">
+      <label>End Date</label>
+      <%= date_field_tag :end_date, @end_date, class: "form-control" %>
+    </div>
+    <div class="col-md-3">
+      <label>Pilih Cabang</label>
+      <%= select_tag :branch_id,
+            options_from_collection_for_select(@branches, :id, :name, @branch_id),
+            include_blank: "Semua Cabang",
+            class: "form-select" %>
+    </div>
+    <div class="col-md-3 d-flex align-items-end">
+      <%= submit_tag "Filter", class: "btn btn-primary" %>
+    </div>
+  </div>
+<% end %>
+
+<%# Bagian Line Chart - menggunakan Chartkick %>
+<div class="mb-5">
+  <%= line_chart @chart_data, xtitle: "Tanggal", ytitle: "Jumlah Booking", library: {height: "400px"} %>
+</div>
+
+<%# Bagian Tabel Data Harian %>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Tanggal</th>
+      <th>Jumlah Booking</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @daily_counts.sort_by { |date, _| date }.each do |date, count| %>
+      <tr>
+        <td><%= date.strftime("%d-%m-%Y") %></td>
+        <td><%= count %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
