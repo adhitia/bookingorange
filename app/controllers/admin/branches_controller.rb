@@ -86,7 +86,7 @@ class Admin::BranchesController < ApplicationController
   end
 
   def branch_params
-    params.require(:branch).permit(:name, :location)
+    params.require(:branch).permit(:name, :location, :phone)
   end
 
   def authorize_admin
