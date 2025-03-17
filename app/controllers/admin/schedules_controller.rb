@@ -35,11 +35,34 @@ class Admin::SchedulesController < ApplicationController
     end
   end
 
-  def destroy
-    if @schedule.destroy
-      flash[:notice] = "Jadwal dokter berhasil dihapus."
+   # Action destroy: jika terdapat booking yang masih terhubung dan fallback belum dipilih, tampilkan form
+   def destroy
+    if @schedule.bookings.exists?
+      if params[:fallback_schedule_id].present?
+        perform_destroy
+      else
+        @fallback_options = Schedule.where(branch_id: @schedule.branch_id).where.not(id: @schedule.id)
+        render :confirm_destroy and return
+      end
     else
-      flash[:alert] = "Gagal menghapus jadwal dokter."
+      if @schedule.destroy
+        flash[:notice] = "Schedule berhasil dihapus."
+      else
+        flash[:alert] = "Gagal menghapus schedule."
+      end
+      redirect_to admin_schedules_path
+    end
+  end
+
+  # Action untuk menghapus schedule setelah fallback dipilih
+  def perform_destroy
+    fallback_schedule = Schedule.find(params[:fallback_schedule_id])
+    # Reassign semua booking yang mengacu ke schedule yang akan dihapus
+    Booking.where(schedule_id: @schedule.id).update_all(schedule_id: fallback_schedule.id)
+    if @schedule.destroy
+      flash[:notice] = "Schedule berhasil dihapus dan semua booking dialihkan ke schedule fallback: #{fallback_schedule.doctor.name} (#{fallback_schedule.day})."
+    else
+      flash[:alert] = "Gagal menghapus schedule."
     end
     redirect_to admin_schedules_path
   end
