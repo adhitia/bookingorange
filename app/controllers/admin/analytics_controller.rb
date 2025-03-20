@@ -12,7 +12,7 @@ class Admin::AnalyticsController < ApplicationController
       @branch_id  = params[:branch_id]
   
       # Ambil booking sesuai filter date range
-      bookings = Booking.where(booking_date: @start_date..@end_date)
+      bookings = Booking.where(created_at: @start_date..@end_date)
   
       # Filter berdasarkan cabang jika branch_id diisi
       bookings = bookings.where(branch_id: @branch_id) if @branch_id.present?
