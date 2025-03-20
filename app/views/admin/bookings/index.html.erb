@@ -1,15 +1,39 @@
-<h1>Management Booking - Admin</h1>
-<%= link_to "Tambah Booking Baru", new_admin_booking_path, class: "btn btn-success mb-3" %>
+<h1>Daftar Booking</h1>
 
-<table class="table table-striped">
+<%= form_with url: admin_bookings_path, method: :get, local: true do %>
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <%= label_tag :booking_date, "Booking Date" %>
+      <%= date_field_tag :booking_date, params[:booking_date], class: "form-control" %>
+    </div>
+    <div class="col-md-3">
+      <%= label_tag :created_at, "Created At" %>
+      <%= date_field_tag :created_at, params[:created_at], class: "form-control" %>
+    </div>
+    <div class="col-md-3">
+      <%= label_tag :branch_id, "Cabang" %>
+      <%= select_tag :branch_id, options_from_collection_for_select(Branch.all, :id, :name, params[:branch_id]), prompt: "Semua Cabang", class: "form-select" %>
+    </div>
+    <div class="col-md-3">
+      <%= label_tag :status, "Status" %>
+      <%= select_tag :status, options_for_select(Booking.statuses.keys.map { |s| [s.titleize, s] }, params[:status]), prompt: "Semua Status", class: "form-select" %>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-md-12">
+      <%= submit_tag "Filter", class: "btn btn-primary" %>
+    </div>
+  </div>
+<% end %>
+
+<table class="table table-bordered">
   <thead>
     <tr>
       <th>ID</th>
-      <th>Tanggal Booking</th>
+      <th>Booking Date</th>
+      <th>Created At</th>
+      <th>Customer Name</th>
       <th>Cabang</th>
-      <th>Dokter</th>
-      <th>Jadwal</th>
-      <th>Customer</th>
       <th>Status</th>
       <th>Aksi</th>
     </tr>
@@ -18,27 +42,19 @@
     <% @bookings.each do |booking| %>
       <tr>
         <td><%= booking.id %></td>
-        <td><%= booking.booking_date.present? ? booking.booking_date.strftime("%d-%m-%Y") : "-" %></td>
-        <td><%= booking.branch.name %></td>
-        <td><%= booking.doctor.name %></td>
-        <td>
-          <% if booking.schedule.present? %>
-            <%= "#{booking.schedule.day} #{booking.schedule.start_time.strftime("%H:%M")} - #{booking.schedule.end_time.strftime("%H:%M")}" %>
-          <% else %>
-            -
-          <% end %>
-        </td>
-        <td>
-          <%= booking.customer_name %><br>
-          <small><%= booking.customer_phone %></small>
-        </td>
+        <td><%= booking.booking_date.strftime("%d-%m-%Y") if booking.booking_date %></td>
+        <td><%= booking.created_at.strftime("%d-%m-%Y %H:%M") %></td>
+        <td><%= booking.customer_name %></td>
+        <td><%= booking.branch.name if booking.branch %></td>
         <td><%= booking.status.titleize %></td>
         <td>
           <%= link_to "Show", admin_booking_path(booking), class: "btn btn-sm btn-info" %>
           <%= link_to "Edit", edit_admin_booking_path(booking), class: "btn btn-sm btn-warning" %>
-          <%= link_to "Hapus", admin_booking_path(booking), method: :delete, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-danger" %>
+          <%= button_to "Delete", admin_booking_path(booking), method: :delete, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-danger" %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<%= paginate @bookings %>
