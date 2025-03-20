@@ -3,24 +3,33 @@
 <%= form_with url: admin_bookings_path, method: :get, local: true do %>
   <div class="row mb-3">
     <div class="col-md-3">
-      <%= label_tag :booking_date, "Booking Date" %>
-      <%= date_field_tag :booking_date, params[:booking_date], class: "form-control" %>
+      <%= label_tag :start_created_at, "Created At (Start Date)" %>
+      <%= date_field_tag :start_created_at, params[:start_created_at] || Date.today, class: "form-control" %>
     </div>
     <div class="col-md-3">
-      <%= label_tag :created_at, "Created At" %>
-      <%= date_field_tag :created_at, params[:created_at], class: "form-control" %>
+      <%= label_tag :end_created_at, "Created At (End Date)" %>
+      <%= date_field_tag :end_created_at, params[:end_created_at] || Date.today, class: "form-control" %>
     </div>
+    <div class="col-md-3">
+      <%= label_tag :start_booking_date, "Booking Date (Start)" %>
+      <%= date_field_tag :start_booking_date, params[:start_booking_date], class: "form-control" %>
+    </div>
+    <div class="col-md-3">
+      <%= label_tag :end_booking_date, "Booking Date (End)" %>
+      <%= date_field_tag :end_booking_date, params[:end_booking_date], class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="row mb-3">
     <div class="col-md-3">
       <%= label_tag :branch_id, "Cabang" %>
-      <%= select_tag :branch_id, options_from_collection_for_select(Branch.all, :id, :name, params[:branch_id]), prompt: "Semua Cabang", class: "form-select" %>
+      <%= select_tag :branch_id, options_from_collection_for_select(@branches, :id, :name, params[:branch_id]), prompt: "Semua Cabang", class: "form-select" %>
     </div>
     <div class="col-md-3">
       <%= label_tag :status, "Status" %>
       <%= select_tag :status, options_for_select(Booking.statuses.keys.map { |s| [s.titleize, s] }, params[:status]), prompt: "Semua Status", class: "form-select" %>
     </div>
-  </div>
-  <div class="row mb-3">
-    <div class="col-md-12">
+    <div class="col-md-3 d-flex align-items-end">
       <%= submit_tag "Filter", class: "btn btn-primary" %>
     </div>
   </div>

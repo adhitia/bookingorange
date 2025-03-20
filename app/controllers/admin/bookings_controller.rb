@@ -4,38 +4,40 @@ class Admin::BookingsController < ApplicationController
   before_action :set_booking, only: [:show, :edit, :update, :destroy]
 
   def index
-    # Default filter: booking dibuat hari ini (created_at)
-    start_of_today = Date.today.beginning_of_day
-    end_of_today   = Date.today.end_of_day
-    @bookings = Booking.where(created_at: start_of_today..end_of_today)
-
-    # Filter berdasarkan booking_date jika ada
-    if params[:booking_date].present?
-      booking_date = Date.parse(params[:booking_date]) rescue nil
-      @bookings = @bookings.where(booking_date: booking_date) if booking_date
+    # Ambil daftar cabang untuk dropdown filter
+    @branches = Branch.all
+  
+    # --- Filter Created At (tanggal dibuat booking) ---
+    if params[:start_created_at].present? && params[:end_created_at].present?
+      start_created = Date.parse(params[:start_created_at]).beginning_of_day rescue Date.today.beginning_of_day
+      end_created   = Date.parse(params[:end_created_at]).end_of_day rescue Date.today.end_of_day
+    else
+      # Default: hari ini
+      start_created = Date.today.beginning_of_day
+      end_created   = Date.today.end_of_day
     end
-
-    # Filter berdasarkan created_at jika ada (misal, untuk tanggal tertentu)
-    if params[:created_at].present?
-      created_date = Date.parse(params[:created_at]) rescue nil
-      if created_date
-        @bookings = @bookings.where(created_at: created_date.beginning_of_day..created_date.end_of_day)
-      end
+  
+    # --- Filter Booking Date (tanggal booking sebenarnya) ---
+    if params[:start_booking_date].present? && params[:end_booking_date].present?
+      start_booking = Date.parse(params[:start_booking_date]) rescue nil
+      end_booking   = Date.parse(params[:end_booking_date]) rescue nil
     end
-
-    # Filter berdasarkan cabang
-    if params[:branch_id].present?
-      @bookings = @bookings.where(branch_id: params[:branch_id])
-    end
-
-    # Filter berdasarkan status
-    if params[:status].present?
-      @bookings = @bookings.where(status: params[:status])
-    end
-
-    # Urutkan berdasarkan created_at descending dan paginasi
-    @bookings = @bookings.order(created_at: :desc).page(params[:page]).per(20)
+  
+    # Mulai query dengan filter created_at
+    bookings = Booking.where(created_at: start_created..end_created)
+  
+    # Jika filter booking_date disediakan, tambahkan filter tersebut
+    bookings = bookings.where(booking_date: start_booking..end_booking) if start_booking && end_booking
+  
+    # Filter berdasarkan cabang jika disediakan
+    bookings = bookings.where(branch_id: params[:branch_id]) if params[:branch_id].present?
+  
+    # Filter berdasarkan status jika disediakan
+    bookings = bookings.where(status: params[:status]) if params[:status].present?
+  
+    @bookings = bookings.order(created_at: :desc).page(params[:page]).per(20)
   end
+  
 
   def show
   end
