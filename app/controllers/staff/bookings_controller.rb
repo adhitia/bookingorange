@@ -57,8 +57,8 @@ class Staff::BookingsController < ApplicationController
             flash[:notice] = "Booking berhasil dibuat."
             redirect_to timetable_staff_bookings_path
         else
-            flash.now[:alert] = "Gagal membuat booking."
-            render :new
+            flash.now[:alert] = "Gagal membuat booking. " + @booking.errors.full_messages.join(", ")
+            render :new_cs
         end
     end
     
@@ -164,13 +164,13 @@ class Staff::BookingsController < ApplicationController
             end_time = @booking.booking_end_time
             if end_time <= @booking.booking_time
                 @booking.errors.add(:booking_end_time, "harus lebih besar dari waktu mulai")
-                render :new and return
+                render :new_cs and return
             else
                 @booking.booking_end_time = end_time
             end
         else
             @booking.errors.add(:booking_end_time, "harus diisi")
-            render :new and return
+            render :new_cs and return
         end
         @booking.status = :confirmed
         if @booking.save
@@ -179,7 +179,7 @@ class Staff::BookingsController < ApplicationController
             redirect_to staff_booking_path(@booking)
         else
             flash.now[:alert] = "Gagal membuat booking."
-            render :new
+            render :new_cs
         end
     end
     
