@@ -99,6 +99,48 @@ module CekatApi
       nil
   end
 
+  def self.send_template_reminder(booking)
+    uri = URI.parse("#{API_URL}/templates/send")
+    headers = {
+      "Content-Type" => "application/json",
+      "api_key" => API_KEY
+    }
+    # Ganti dengan template ID yang telah diset di cekat.ai untuk reminder
+    template_id = "664182436109824" 
+
+    # Format tanggal menggunakan helper (pastikan helper indonesian_date sudah didefinisikan)
+    formatted_date = booking.booking_date.present? ? ApplicationController.helpers.indonesian_date(booking.booking_date) : ""
+    formatted_time = booking.booking_time.present? ? booking.booking_time.strftime("%H:%M") : ""
+    doctor_name    = booking.doctor.present? ? booking.doctor.name : ""
+
+    payload = {
+      wa_template_id: template_id,
+      template_body_variables: [
+        booking.customer_name,   # Misalnya: "Halo {{1}}!"
+        "Dokter Gigi",
+        booking.branch.name,          # Misalnya: "Senin, 17 Maret 2025"
+        formatted_time,          # Misalnya: "10:00"
+        "https://wa.me/#{sanitize_phone_number(booking.branch.phone)}"  # Misalnya: "https://wa.me/628123456789"
+      ],
+      inbox_id: "c76d94c4-4de3-4703-ab00-75ac56cee2be",
+      phone_number: sanitize_phone_number(booking.customer_phone),
+      phone_name: booking.customer_name
+    }
+    
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = (uri.scheme == "https")
+    request = Net::HTTP::Post.new(uri.request_uri, headers)
+    request.body = payload.to_json
+
+    response = http.request(request)
+    result = JSON.parse(response.body)
+    Rails.logger.info("Cekat API Reminder Response: #{result.inspect}")
+    result
+  rescue StandardError => e
+    Rails.logger.error("Error sending reminder: #{e.message}")
+    nil
+  end
+
   # Fungsi sanitizer nomor telepon agar format internasional
   def self.sanitize_phone_number(phone)
     sanitized = phone.to_s.strip.gsub(/\s+/, '').gsub(/[-()]/, '')
