@@ -4,24 +4,21 @@
 <!-- Include Chartkick via CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chartkick/dist/chartkick.min.js"></script>
 
-<h1>Analisis Booking Harian</h1>
+<h1>Analisa Booking Berdasarkan Tanggal Dibuat (Created At)</h1>
 
 <%= form_with url: admin_analytics_bookings_path, method: :get, local: true do %>
   <div class="row mb-3">
     <div class="col-md-3">
-      <label>Start Date</label>
+      <%= label_tag :start_date, "Start Date" %>
       <%= date_field_tag :start_date, @start_date, class: "form-control" %>
     </div>
     <div class="col-md-3">
-      <label>End Date</label>
+      <%= label_tag :end_date, "End Date" %>
       <%= date_field_tag :end_date, @end_date, class: "form-control" %>
     </div>
     <div class="col-md-3">
-      <label>Pilih Cabang</label>
-      <%= select_tag :branch_id,
-            options_from_collection_for_select(@branches, :id, :name, @branch_id),
-            include_blank: "Semua Cabang",
-            class: "form-select" %>
+      <%= label_tag :branch_id, "Cabang" %>
+      <%= select_tag :branch_id, options_from_collection_for_select(@branches, :id, :name, @branch_id), prompt: "Semua Cabang", class: "form-select" %>
     </div>
     <div class="col-md-3 d-flex align-items-end">
       <%= submit_tag "Filter", class: "btn btn-primary" %>
@@ -29,24 +26,38 @@
   </div>
 <% end %>
 
-<%# Bagian Line Chart - menggunakan Chartkick %>
-<div class="mb-5">
-  <%= line_chart @chart_data, xtitle: "Tanggal", ytitle: "Jumlah Booking", library: {height: "400px"} %>
+<h2>Total Booking</h2>
+<div>
+  <%= line_chart @total_booking, xtitle: "Tanggal", ytitle: "Jumlah Booking", library: { height: "400px" } %>
 </div>
 
-<%# Bagian Tabel Data Harian %>
+<h2>Booking oleh Customer Service</h2>
+<div>
+  <%= line_chart @booking_cs, xtitle: "Tanggal", ytitle: "Jumlah Booking", library: { height: "400px" } %>
+</div>
+
+<h2>Booking oleh Staff Cabang</h2>
+<div>
+  <%= line_chart @booking_staff, xtitle: "Tanggal", ytitle: "Jumlah Booking", library: { height: "400px" } %>
+</div>
+
+<h2>Data Tabel</h2>
 <table class="table table-bordered">
   <thead>
     <tr>
       <th>Tanggal</th>
-      <th>Jumlah Booking</th>
+      <th>Total Booking</th>
+      <th>Customer Service</th>
+      <th>Staff Cabang</th>
     </tr>
   </thead>
   <tbody>
-    <% @daily_counts.sort_by { |date, _| date }.each do |date, count| %>
+    <% (@total_booking.keys.sort).each do |date| %>
       <tr>
         <td><%= date.strftime("%d-%m-%Y") %></td>
-        <td><%= count %></td>
+        <td><%= @total_booking[date] || 0 %></td>
+        <td><%= @booking_cs[date] || 0 %></td>
+        <td><%= @booking_staff[date] || 0 %></td>
       </tr>
     <% end %>
   </tbody>

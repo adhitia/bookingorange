@@ -1,41 +1,41 @@
 class Admin::AnalyticsController < ApplicationController
-    before_action :authenticate_user!
-    before_action :authorize_admin
+  before_action :authenticate_user!
+  before_action :authorize_admin
+
+  def bookings
+    @branches = Branch.all
   
-    def bookings
-      # Ambil daftar cabang untuk dropdown filter
-      @branches = Branch.all
+    # Filter berdasarkan tanggal created_at, default 7 hari terakhir
+    @start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : 7.days.ago.to_date
+    @end_date   = params[:end_date].present?   ? Date.parse(params[:end_date])   : Date.today
+    @branch_id  = params[:branch_id]
   
-      # Ambil parameter filter
-      @start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : 7.days.ago.to_date
-      @end_date   = params[:end_date].present?   ? Date.parse(params[:end_date])   : Date.today
-      @branch_id  = params[:branch_id]
+    # Ambil booking berdasarkan created_at dalam rentang waktu lokal (asumsi disimpan sebagai local time)
+    bookings = Booking.where(created_at: @start_date.beginning_of_day..@end_date.end_of_day)
+    bookings = bookings.where(branch_id: @branch_id) if @branch_id.present?
   
-      # Ambil booking sesuai filter date range
-      bookings = Booking.where(created_at: @start_date..@end_date)
+    # Gunakan query grouping manual dengan SQL function DATE(created_at)
+    @total_booking = bookings.group("DATE(created_at)").count
   
-      # Filter berdasarkan cabang jika branch_id diisi
-      bookings = bookings.where(branch_id: @branch_id) if @branch_id.present?
+    # Asumsikan user memiliki enum role: { admin: 0, customer_service: 1, staff_cabang: 2 }
+    cs_ids = User.where(role: :customer_service).pluck(:id)
+    staff_ids = User.where(role: :staff_cabang).pluck(:id)
   
-      # Hitung total booking harian
-      # Contoh: group by booking_date lalu count
-      # Pastikan booking_date disimpan sebagai date di DB
-      @daily_counts = bookings.group(:created_at).count
+    @booking_cs = bookings.where(created_by_id: cs_ids).group("DATE(created_at)").count
+    @booking_staff = bookings.where(created_by_id: staff_ids).group("DATE(created_at)").count
   
-      # Contoh: data untuk line chart (Chartkick format) -> array of [date, count]
-      # sorted agar urutan x-axis berurutan
-      @chart_data = @daily_counts.sort_by { |date, _| date }.map { |date, c| [date, c] }
-  
-      # Anda juga bisa menampilkan data di tabel @daily_counts
-    end
-  
-    private
-  
-    def authorize_admin
-      unless current_user.admin?
-        flash[:alert] = "Akses hanya untuk admin."
-        redirect_to root_path
-      end
+    # Ubah hasil grouping menjadi format array untuk Chartkick, misalnya:
+    @chart_total = @total_booking.sort_by { |date, _| date }.map { |date, count| [date, count] }
+    @chart_cs = @booking_cs.sort_by { |date, _| date }.map { |date, count| [date, count] }
+    @chart_staff = @booking_staff.sort_by { |date, _| date }.map { |date, count| [date, count] }
+  end
+
+  private
+
+  def authorize_admin
+    unless current_user.admin?
+      flash[:alert] = "Akses hanya untuk admin."
+      redirect_to root_path
     end
   end
-  
+end
