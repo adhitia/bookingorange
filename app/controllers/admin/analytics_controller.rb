@@ -20,7 +20,7 @@ class Admin::AnalyticsController < ApplicationController
       # Hitung total booking harian
       # Contoh: group by booking_date lalu count
       # Pastikan booking_date disimpan sebagai date di DB
-      @daily_counts = bookings.group(:booking_date).count
+      @daily_counts = bookings.group(:created_at).count
   
       # Contoh: data untuk line chart (Chartkick format) -> array of [date, count]
       # sorted agar urutan x-axis berurutan
