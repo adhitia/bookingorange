@@ -178,7 +178,7 @@ class Staff::BookingsController < ApplicationController
             flash[:notice] = "Booking berhasil dibuat."
             redirect_to staff_booking_path(@booking)
         else
-            flash.now[:alert] = "Gagal membuat booking."
+            flash.now[:alert] = "Gagal membuat booking." + @booking.errors.full_messages.join(", ")
             render :new_cs
         end
     end
