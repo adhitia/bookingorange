@@ -46,6 +46,7 @@
                   <%= link_to edit_staff_booking_path(real_book), class: "text-decoration-none text-dark" do %>
                     <strong><%= real_book.customer_name %></strong><br>
                     <small><%= real_book.doctor.name %></small><br>
+                    <small><%= real_book.doctor.keterangan %></small><br>
                   <% end %>
                 <% end %>
               <% else %>
