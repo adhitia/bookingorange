@@ -1,4 +1,10 @@
-<h1>Time Table Jadwal 7 Hari Kedepan</h1>
+<h1>Time Table Jadwal Mingguan</h1>
+
+<!-- Navigasi Mingguan -->
+<div class="d-flex justify-content-between mb-3">
+  <%= link_to "Minggu Sebelumnya", timetable_staff_bookings_path(start_date: (@dates.first - 7).to_s), class: "btn btn-secondary" %>
+  <%= link_to "Minggu Berikutnya", timetable_staff_bookings_path(start_date: (@dates.first + 7).to_s), class: "btn btn-secondary" %>
+</div>
 
 <table class="table table-bordered">
   <thead>

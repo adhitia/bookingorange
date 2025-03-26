@@ -309,8 +309,11 @@ class Staff::BookingsController < ApplicationController
     end
     
     def timetable
+        start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : Date.today
         # Ambil tanggal dari hari ini sampai 6 hari ke depan (total 7 hari)
-        @dates = (Date.today..(Date.today + 6)).to_a
+        @dates = (start_date..(start_date + 6)).to_a
+        
+        
         
         # Definisikan time slot tiap 30 menit dari pukul 10:00 sampai 20:00
         start_time = Time.zone.parse("#{Date.today} 10:00")
