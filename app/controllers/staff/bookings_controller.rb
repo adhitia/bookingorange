@@ -312,9 +312,7 @@ class Staff::BookingsController < ApplicationController
         start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : Date.today
         # Ambil tanggal dari hari ini sampai 6 hari ke depan (total 7 hari)
         @dates = (start_date..(start_date + 6)).to_a
-        
-        
-        
+                
         # Definisikan time slot tiap 30 menit dari pukul 10:00 sampai 20:00
         start_time = Time.zone.parse("#{Date.today} 10:00")
         end_time   = Time.zone.parse("#{Date.today} 21:00")
@@ -325,7 +323,7 @@ class Staff::BookingsController < ApplicationController
         end
         
         # Ambil semua booking untuk branch staff dalam rentang tanggal tersebut, kecuali yang dibatalkan
-        @bookings = Booking.where(branch_id: current_user.branch_id, booking_date: Date.today..(Date.today + 6))
+        @bookings = Booking.where(branch_id: current_user.branch_id, booking_date: start_date..(start_date + 6))
                            .where.not(status: 'canceled')
         
         # Buat lookup hash dengan key: [booking_date, booking_time_str]
