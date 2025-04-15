@@ -8,7 +8,7 @@ class Staff::BookingsController < ApplicationController
         @branches = [current_user.branch]
         @doctors  = Doctor.all
         @statuses = Booking.statuses.keys
-        @bookings = Booking.where(branch_id: current_user.branch_id).includes(:doctor, :schedule)
+        @bookings = Booking.where(branch_id: current_user.branch_id, status: :scheduled).includes(:doctor, :schedule)
     end
     
     def new
