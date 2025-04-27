@@ -6,7 +6,7 @@ class Admin::BookingsController < ApplicationController
   def index
     # Ambil daftar cabang untuk dropdown filter
     @branches = Branch.all
-    @branch = params[:branch_id].present? Branch.find params[:branch_id] : Branch.last
+    @branch = params[:branch_id].present? ? Branch.find(params[:branch_id]) : Branch.last
     @branch_id = params[:branch_id]
     start_created = params[:start_date].present? ? Date.parse(params[:start_date]) : Date.today
   
