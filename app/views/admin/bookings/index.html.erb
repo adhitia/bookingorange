@@ -1,33 +1,11 @@
-<h1>Daftar Booking</h1>
+<h1>Time Table Jadwal Mingguan</h1>
 
 <%= form_with url: admin_bookings_path, method: :get, local: true do %>
-  <div class="row mb-3">
-    <div class="col-md-3">
-      <%= label_tag :start_created_at, "Created At (Start Date)" %>
-      <%= date_field_tag :start_created_at, params[:start_created_at] || Date.today, class: "form-control" %>
-    </div>
-    <div class="col-md-3">
-      <%= label_tag :end_created_at, "Created At (End Date)" %>
-      <%= date_field_tag :end_created_at, params[:end_created_at] || Date.today, class: "form-control" %>
-    </div>
-    <div class="col-md-3">
-      <%= label_tag :start_booking_date, "Booking Date (Start)" %>
-      <%= date_field_tag :start_booking_date, params[:start_booking_date], class: "form-control" %>
-    </div>
-    <div class="col-md-3">
-      <%= label_tag :end_booking_date, "Booking Date (End)" %>
-      <%= date_field_tag :end_booking_date, params[:end_booking_date], class: "form-control" %>
-    </div>
-  </div>
-
+  
   <div class="row mb-3">
     <div class="col-md-3">
       <%= label_tag :branch_id, "Cabang" %>
       <%= select_tag :branch_id, options_from_collection_for_select(@branches, :id, :name, params[:branch_id]), prompt: "Semua Cabang", class: "form-select" %>
-    </div>
-    <div class="col-md-3">
-      <%= label_tag :status, "Status" %>
-      <%= select_tag :status, options_for_select(Booking.statuses.keys.map { |s| [s.titleize, s] }, params[:status]), prompt: "Semua Status", class: "form-select" %>
     </div>
     <div class="col-md-3 d-flex align-items-end">
       <%= submit_tag "Filter", class: "btn btn-primary" %>
@@ -35,35 +13,72 @@
   </div>
 <% end %>
 
+<% if params[:branch_id].blank? %>
+
+<% else %>
+<!-- Navigasi Mingguan -->
+<div class="d-flex justify-content-between mb-3">
+  <%= link_to "Minggu Sebelumnya", admin_bookings_path(start_date: (@dates.first - 7).to_s, branch_id: params[:branch_id]), class: "btn btn-secondary" %>
+  <%= link_to "Minggu Berikutnya", admin_bookings_path(start_date: (@dates.first + 7).to_s, branch_id: params[:branch_id]), class: "btn btn-secondary" %>
+</div>
+
 <table class="table table-bordered">
   <thead>
     <tr>
-      <th>ID</th>
-      <th>Booking Date</th>
-      <th>Created At</th>
-      <th>Customer Name</th>
-      <th>Cabang</th>
-      <th>Status</th>
-      <th>Aksi</th>
+      <th style="width: 80px;">Waktu</th>
+      <% @dates.each do |date| %>
+        <th><%= indonesian_date(date) %></th>
+      <% end %>
     </tr>
   </thead>
   <tbody>
-    <% @bookings.each do |booking| %>
+    <% @time_slots.each do |slot| %>
       <tr>
-        <td><%= booking.id %></td>
-        <td><%= booking.booking_date.strftime("%d-%m-%Y") if booking.booking_date %></td>
-        <td><%= booking.created_at.strftime("%d-%m-%Y %H:%M") %></td>
-        <td><%= booking.customer_name %></td>
-        <td><%= booking.branch.name if booking.branch %></td>
-        <td><%= booking.status.titleize %></td>
-        <td>
-          <%= link_to "Show", admin_booking_path(booking), class: "btn btn-sm btn-info" %>
-          <%= link_to "Edit", edit_admin_booking_path(booking), class: "btn btn-sm btn-warning" %>
-          <%= button_to "Delete", admin_booking_path(booking), method: :delete, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-danger" %>
-        </td>
+        <td><strong><%= slot %></strong></td>
+        <% @dates.each do |date| %>
+          <% key = [date, slot] %>
+          <% # Dapatkan nama hari dalam bahasa Indonesia untuk tanggal ini
+             day = convert_to_indonesian(date.strftime("%A"))
+          %>
+          <% # Cari jadwal di cabang staff yang aktif untuk hari tersebut dan yang mencakup slot ini
+             matching_schedules = @branch.schedules.select do |s|
+               s.day == day &&
+               slot >= s.start_time.strftime("%H:%M") &&
+               slot < s.end_time.strftime("%H:%M")
+             end
+          %>
+          <% slot_plus = (Time.zone.parse(slot) + 30.minutes).strftime("%H:%M") %>
+          <% book_still_exist = @bookings.where(booking_date: date).where("booking_time <= ?",slot ).where("booking_end_time >= ?", slot_plus) %>
+
+          <% cell_bg = if matching_schedules.empty?
+                        "#F2F2F2"  # Tidak ada jadwal, gunakan warna netral
+                      elsif !book_still_exist.blank?
+                        "#F07C00"  # Booking sudah ada, gunakan warna oranye
+                      else
+                        "#D8CD9C45" # Slot kosong, tapi ada jadwal dokter
+                      end
+          %>
+          <td style="vertical-align: middle; text-align: center; background-color: <%= cell_bg %>;">
+            <% if matching_schedules.empty? %>
+              <em>No Doctor</em>
+            <% else %>
+              <% if !book_still_exist.blank? %>
+                <% book_still_exist.each do |real_book| %>
+                  <!-- Jika slot sudah terbooking, klik untuk edit booking -->
+                  <%= link_to edit_admin_booking_path(real_book), class: "text-decoration-none text-dark" do %>
+                    <strong><%= real_book.customer_name %></strong><br>
+                    <small><%= real_book.doctor.name %></small><br>
+                    <small><%= real_book.keterangan %></small><br>
+                  <% end %>
+                <% end %>
+              <% else %>
+
+              <% end %>
+            <% end %>
+          </td>
+        <% end %>
       </tr>
     <% end %>
   </tbody>
 </table>
-
-<%= paginate @bookings %>
+<% end %>

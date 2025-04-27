@@ -6,36 +6,34 @@ class Admin::BookingsController < ApplicationController
   def index
     # Ambil daftar cabang untuk dropdown filter
     @branches = Branch.all
+    @branch = Branch.find params[:branch_id]
+    @branch_id = params[:branch_id]
+    start_created = params[:start_date].present? ? Date.parse(params[:start_date]) : Date.today
   
-    # --- Filter Created At (tanggal dibuat booking) ---
-    if params[:start_created_at].present? && params[:end_created_at].present?
-      start_created = Date.parse(params[:start_created_at]).beginning_of_day rescue Date.today.beginning_of_day
-      end_created   = Date.parse(params[:end_created_at]).end_of_day rescue Date.today.end_of_day
-    else
-      # Default: hari ini
-      start_created = Date.today.beginning_of_day
-      end_created   = Date.today.end_of_day
+    # Ambil tanggal dari hari ini sampai 6 hari ke depan (total 7 hari)
+    @dates = (start_created..(start_created + 6)).to_a
+            
+    # Definisikan time slot tiap 30 menit dari pukul 10:00 sampai 20:00
+    start_time = Time.zone.parse("#{Date.today} 10:00")
+    end_time   = Time.zone.parse("#{Date.today} 21:00")
+    @time_slots = []
+    while start_time < end_time
+        @time_slots << start_time.strftime("%H:%M")
+        start_time += 30.minutes
     end
-  
-    # --- Filter Booking Date (tanggal booking sebenarnya) ---
-    if params[:start_booking_date].present? && params[:end_booking_date].present?
-      start_booking = Date.parse(params[:start_booking_date]) rescue nil
-      end_booking   = Date.parse(params[:end_booking_date]) rescue nil
+    
+    # Ambil semua booking untuk branch staff dalam rentang tanggal tersebut, kecuali yang dibatalkan
+    @bookings = Booking.where(branch_id: @branch_id, booking_date: start_created..(start_created + 6))
+                       .where.not(status: 'canceled')
+    
+    # Buat lookup hash dengan key: [booking_date, booking_time_str]
+    @booking_lookup = {}
+    @bookings.each do |booking|
+        key = [booking.booking_date, booking.booking_time.strftime("%H:%M")]
+        @booking_lookup[key] = booking
     end
-  
-    # Mulai query dengan filter created_at
-    bookings = Booking.where(created_at: start_created..end_created)
-  
-    # Jika filter booking_date disediakan, tambahkan filter tersebut
-    bookings = bookings.where(booking_date: start_booking..end_booking) if start_booking && end_booking
-  
-    # Filter berdasarkan cabang jika disediakan
-    bookings = bookings.where(branch_id: params[:branch_id]) if params[:branch_id].present?
-  
-    # Filter berdasarkan status jika disediakan
-    bookings = bookings.where(status: params[:status]) if params[:status].present?
-  
-    @bookings = bookings.order(created_at: :desc).page(params[:page]).per(20)
+
+
   end
   
 
