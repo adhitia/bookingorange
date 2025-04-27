@@ -7,6 +7,7 @@ class Booking < ApplicationRecord
   default_scope { where(deleted_at: nil) }
 
   enum status: { scheduled: 0, rescheduled: 1, confirmed: 2, complete: 3, canceled: 4 }
+  enum tipe_booking: { new_patient: 0, existing_patient: 1, non_patient: 2}
 
   private
 

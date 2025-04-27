@@ -66,6 +66,14 @@
       <%= f.text_field :customer_phone, class: "form-control" %>
     </div>
 
+    <div class="mb-3">
+      <%= f.label :tipe_booking, "Tipe booking", class: "form-label" %>
+      <%= f.select :tipe_booking, 
+            options_for_select(Booking.tipe_bookings.keys.map { |key| [key.humanize, key] }, f.object.tipe_booking), 
+            { prompt: "Pilih Tipe Booking" }, 
+            class: "form-control" %>
+    </div>
+
     <!-- Field baru untuk keterangan -->
     <div class="mb-3">
       <%= f.label :keterangan, "Keterangan", class: "form-label" %>

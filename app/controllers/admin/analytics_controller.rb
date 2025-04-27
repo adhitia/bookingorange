@@ -11,7 +11,7 @@ class Admin::AnalyticsController < ApplicationController
     @branch_id  = params[:branch_id]
   
     # Ambil booking berdasarkan created_at dalam rentang waktu lokal (asumsi disimpan sebagai local time)
-    bookings = Booking.where(created_at: @start_date.beginning_of_day..@end_date.end_of_day)
+    bookings = Booking.where(created_at: @start_date.beginning_of_day..@end_date.end_of_day, tipe_booking: :new_patient)
     bookings = bookings.where(branch_id: @branch_id) if @branch_id.present?
   
     # Gunakan query grouping manual dengan SQL function DATE(created_at)

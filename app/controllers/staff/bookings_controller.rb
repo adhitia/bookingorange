@@ -346,7 +346,7 @@ class Staff::BookingsController < ApplicationController
     end
     
     def booking_params
-        params.require(:booking).permit(:booking_date, :booking_time, :customer_name, :customer_phone, :branch_id, :slot_combined, :booking_end_time, :keterangan)
+        params.require(:booking).permit(:booking_date, :booking_time, :customer_name, :customer_phone, :branch_id, :slot_combined, :booking_end_time, :keterangan, :tipe_booking)
     end
     
     def authorize_staff
