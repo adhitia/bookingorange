@@ -59,5 +59,12 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :api do
+    namespace :v1 do
+      get 'check_schedule', to: 'schedules#check'
+    end
+  end
+
+  # Routing untuk halaman utama
    root "home#index"
 end

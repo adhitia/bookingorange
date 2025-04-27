@@ -365,9 +365,9 @@ class Staff::BookingsController < ApplicationController
         "Friday"    => "Jumat",
         "Saturday"  => "Sabtu",
         "Sunday"    => "Minggu"
-    }
-    mapping[day_name] || day_name
-end
+        }
+        mapping[day_name] || day_name
+    end
 
 # Helper untuk menghitung available slots berdasarkan booking_date
 def load_available_slots(date)
