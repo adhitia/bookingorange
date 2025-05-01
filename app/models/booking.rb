@@ -12,6 +12,7 @@ class Booking < ApplicationRecord
 
   enum status: { scheduled: 0, rescheduled: 1, confirmed: 2, complete: 3, canceled: 4 }
   enum tipe_booking: { new_patient: 0, existing_patient: 1, non_patient: 2}
+  after_create :send_to_webhook
 
   def send_to_webhook
     return if customer_phone.blank?
