@@ -14,6 +14,7 @@ class Booking < ApplicationRecord
   enum tipe_booking: { new_patient: 0, existing_patient: 1, non_patient: 2}
 
   def send_to_webhook
+    return if customer_phone.blank?
     webhook_url = "https://primary-production-3167.up.railway.app/webhook/feb7180c-b267-4392-b1f9-55af98ad381b"
 
     uri = URI.parse(webhook_url)
@@ -26,7 +27,7 @@ class Booking < ApplicationRecord
     })
 
     payload = {
-      phone_number: self.customer_phone
+      phone_number: normalize_phone_number(self.customer_phone)
     }
 
     request.body = payload.to_json
@@ -41,6 +42,23 @@ class Booking < ApplicationRecord
   end
 
   private
+
+  def normalize_phone_number(raw)
+    return nil if raw.blank?
+
+    num = raw.gsub(/\D/, "") # hapus karakter selain angka
+
+    # +62812xxxx → 0812xxxx
+    if num.start_with?("62")
+      "0" + num[2..]
+    elsif num.start_with?("8")
+      "0" + num
+    elsif num.start_with?("0")
+      num
+    else
+      nil # ga valid
+    end
+  end
 
   def no_duplicate_booking
     # Cari booking lain yang memiliki field sama persis
