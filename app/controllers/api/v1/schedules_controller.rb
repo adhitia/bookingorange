@@ -5,7 +5,7 @@ module Api
           today = Date.current
           end_date = today + 3.days
   
-          branches = Branch.all
+          branches = Branch.where(name: params[:lokasi])
   
           data = branches.map do |branch|
             {
