@@ -34,7 +34,8 @@
             [display_text, value]
           end, "#{@booking.schedule_id}|#{@booking.booking_time.strftime('%H:%M')}"), 
           { prompt: "Pilih Slot" }, 
-          class: "form-select" %>
+          class: "form-select",
+          id: "available_slots_select" %>
   </div>
 
   <!-- Field untuk Waktu Selesai -->
@@ -64,16 +65,29 @@
   </div>
 <% end %>
 
-<!-- Script Ajax: Ketika tanggal diubah, update dropdown slot -->
 <script>
   document.addEventListener("DOMContentLoaded", function(){
     var dateField = document.getElementById("booking_date_field");
     dateField.addEventListener("change", function(){
-      var selectedDate = dateField.value;
-      $.ajax({
-        url: "<%= available_slots_staff_bookings_path %>",
-        data: { booking_date: selectedDate },
-        dataType: "script"
+      var selectedDate = this.value;
+      // Bangun URL dengan param
+      var url = new URL("<%= available_slots_staff_bookings_path %>", window.location.origin);
+      url.searchParams.append("booking_date", selectedDate);
+      url.searchParams.append("id", "<%= @booking.id %>");
+      // Fetch dengan header Accept JS
+      fetch(url, {
+        headers: { "Accept": "application/javascript" }
+      })
+      .then(function(response){
+        if (!response.ok) throw new Error("Network response was not ok");
+        return response.text();
+      })
+      .then(function(js){
+        // Jalankan JS yang dikembalikan (available_slots.js.erb)
+        eval(js);
+      })
+      .catch(function(error){
+        console.error("Fetch error:", error);
       });
     });
   });

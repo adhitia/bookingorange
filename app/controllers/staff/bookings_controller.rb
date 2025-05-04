@@ -2,7 +2,8 @@ class Staff::BookingsController < ApplicationController
     before_action :authenticate_user!
     before_action :authorize_staff
     before_action :set_booking, only: [:show, :edit, :update, :cancel, :complete, :confirm]
-    
+    skip_forgery_protection only: [:available_slots]
+
     def index
         # Hanya tampilkan booking dari cabang staff
         @branches = [current_user.branch]
@@ -211,16 +212,16 @@ class Staff::BookingsController < ApplicationController
     def update
         bp = booking_params.except(:slot_combined)
         slot_combined = booking_params[:slot_combined]
-      
         # Jika staff memilih slot baru, proses slot_combined untuk menentukan schedule, booking_time, dan doctor.
         if slot_combined.present?
           schedule_id, slot_str = slot_combined.split("|")
+          @booking.schedule_id = schedule_id
           schedule = Schedule.find(schedule_id)
-          bp[:schedule_id] = schedule_id
           bp[:booking_time] = Time.zone.parse(slot_str)
           bp[:doctor_id] = schedule.doctor_id
         end
-      
+        
+        
         # Pastikan booking_end_time sudah diinput dan valid.
         if bp[:booking_end_time].present?
           new_end_time = bp[:booking_end_time]
@@ -346,7 +347,7 @@ class Staff::BookingsController < ApplicationController
     end
     
     def booking_params
-        params.require(:booking).permit(:booking_date, :booking_time, :customer_name, :customer_phone, :branch_id, :slot_combined, :booking_end_time, :keterangan, :tipe_booking)
+        params.require(:booking).permit(:booking_date, :booking_time, :customer_name, :customer_phone, :branch_id, :slot_combined, :booking_end_time, :keterangan, :tipe_booking, :schedule_id)
     end
     
     def authorize_staff

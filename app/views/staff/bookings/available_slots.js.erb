@@ -1,5 +1,16 @@
-var options = "<option value=''>Pilih Slot</option>";
-<% @available_slots.each do |slot| %>
-  options += "<option value='<%= "#{slot[:schedule].id}|#{slot[:slot_time].strftime('%H:%M')}" %>'><%= "#{slot[:schedule].doctor.name}: #{slot[:slot_time].strftime('%H:%M')} - #{(slot[:slot_time] + 30.minute).strftime('%H:%M')}" %></option>";
-<% end %>
-$("#available_slots_select").html(options);
+(function() {
+  var select = document.getElementById("available_slots_select");
+  if (!select) return;
+
+  // Bangun HTML option
+  var optionsHtml = '<option value="">Pilih Slot</option>';
+  <% @available_slots.each do |slot| %>
+    optionsHtml += '<option value="<%= "#{slot[:schedule].id}|#{slot[:slot_time].strftime("%H:%M")}" %>">' +
+                   '<%= j "#{slot[:schedule].doctor.name}: #{slot[:slot_time].strftime("%H:%M")} - #{(slot[:slot_time] + 30.minutes).strftime("%H:%M")}" %>' +
+                   '</option>';
+  <% end %>
+
+  // Sisipkan ke select
+  select.innerHTML = optionsHtml;
+})();
+console.log("Available slots loaded");
