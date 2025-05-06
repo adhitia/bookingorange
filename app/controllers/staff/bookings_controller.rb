@@ -123,7 +123,7 @@ class Staff::BookingsController < ApplicationController
     def confirm
         if @booking.update(status: "confirmed")
             # Opsional: Kirim notifikasi WhatsApp
-            CekatApi.confirm_book(@booking)
+            # CekatApi.confirm_book(@booking)
             flash[:notice] = "Booking berhasil dikonfirmasi dan notifikasi WhatsApp telah dikirim."
             redirect_to staff_booking_path(@booking)
         else
@@ -175,7 +175,7 @@ class Staff::BookingsController < ApplicationController
         end
         @booking.status = :confirmed
         if @booking.save
-            CekatApi.confirm_book(@booking)
+            # CekatApi.confirm_book(@booking)
             flash[:notice] = "Booking berhasil dibuat."
             redirect_to staff_booking_path(@booking)
         else
@@ -252,7 +252,7 @@ class Staff::BookingsController < ApplicationController
         if @booking.update(bp)
           # Ubah status booking ke rescheduled jika ada perubahan jadwal.
           @booking.update(status: :confirmed)
-          CekatApi.confirm_book(@booking)
+        #   CekatApi.confirm_book(@booking)
           flash[:notice] = "Booking berhasil diupdate."
           redirect_to staff_booking_path(@booking)
         else
