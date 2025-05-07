@@ -127,7 +127,8 @@ class Staff::BookingsController < ApplicationController
             flash[:notice] = "Booking berhasil dikonfirmasi dan notifikasi WhatsApp telah dikirim."
             redirect_to staff_booking_path(@booking)
         else
-            flash[:alert] = "Gagal mengonfirmasi booking."
+            error_messages = @booking.errors.full_messages.join(", ")
+            flash[:alert] = "Gagal mengonfirmasi booking: #{error_messages}"
             redirect_to staff_booking_path(@booking)
         end
     end
