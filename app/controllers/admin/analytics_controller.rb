@@ -9,10 +9,15 @@ class Admin::AnalyticsController < ApplicationController
     @start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : 7.days.ago.to_date
     @end_date   = params[:end_date].present?   ? Date.parse(params[:end_date])   : Date.today
     @branch_id  = params[:branch_id]
-    @tipe_booking = params[:tipe_booking] || :new_patient
+    @tipe_booking = params[:tipe_booking]
 
     # Ambil booking berdasarkan created_at dalam rentang waktu lokal (asumsi disimpan sebagai local time)
-    bookings = Booking.where(created_at: @start_date.beginning_of_day..@end_date.end_of_day, tipe_booking: @tipe_booking)
+    if @tipe_booking.blank?
+      bookings = Booking.where(created_at: @start_date.beginning_of_day..@end_date.end_of_day).where.not(tipe_booking: :non_patient)
+    else
+      bookings = Booking.where(created_at: @start_date.beginning_of_day..@end_date.end_of_day, tipe_booking: @tipe_booking)
+    end
+    
     bookings = bookings.where(branch_id: @branch_id) if @branch_id.present?
   
     # Gunakan query grouping manual dengan SQL function DATE(created_at)
