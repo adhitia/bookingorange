@@ -318,7 +318,7 @@ class Staff::BookingsController < ApplicationController
                 
         # Definisikan time slot tiap 30 menit dari pukul 10:00 sampai 20:00
         start_time = Time.zone.parse("#{Date.today} 10:00")
-        end_time   = Time.zone.parse("#{Date.today} 20:00")
+        end_time   = Time.zone.parse("#{Date.today} 20:30")
         @time_slots = []
         while start_time < end_time
             @time_slots << start_time.strftime("%H:%M")
