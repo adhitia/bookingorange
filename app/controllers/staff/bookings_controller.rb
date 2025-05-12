@@ -278,6 +278,7 @@ class Staff::BookingsController < ApplicationController
         @booking.status = :complete
         if @booking.save
             flash[:notice] = "Booking telah diselesaikan."
+            CekatApi.complete_book(@booking)
             redirect_to all_staff_bookings_path
         else
             flash[:alert] = "Gagal mengubah status booking."

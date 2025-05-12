@@ -8,7 +8,7 @@ module CekatApi
   API_KEY = ENV.fetch("CEKAT_API_KEY")
 
   # Method untuk mengirim template WhatsApp
-  def self.complete_bok(booking)
+  def self.complete_book(booking)
     uri = URI.parse("#{API_URL}/templates/send")
     
     headers = {
@@ -26,10 +26,9 @@ module CekatApi
 
     # Contoh payload. Pastikan field inbox_id disesuaikan, misalnya bisa diambil dari booking atau dari konfigurasi.
     payload = {
-      wa_template_id: "1171228227689800",  # Sesuaikan template ID yang telah di-APPROVED
+      wa_template_id: "1797383624165360",  # Sesuaikan template ID yang telah di-APPROVED
       template_body_variables: [
-        booking.customer_name,
-        "customer satisfaction survey",
+        booking.customer_name
       ],
       inbox_id: "c76d94c4-4de3-4703-ab00-75ac56cee2be",  # Sesuaikan dengan ID inbox yang digunakan
       phone_number: sanitize_phone_number(booking.customer_phone),  # Pastikan sudah dalam format internasional, misal: "628123456789"
