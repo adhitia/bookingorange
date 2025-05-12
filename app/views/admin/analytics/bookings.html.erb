@@ -59,13 +59,38 @@
     </tr>
   </thead>
   <tbody>
-    <% (@total_booking.keys.sort).each do |date| %>
+    <% @total_booking.keys.sort.each do |date| %>
       <tr>
         <td><%= date.strftime("%d-%m-%Y") %></td>
         <td><%= @total_booking[date] || 0 %></td>
-        <td><%= @booking_cs[date] || 0 %></td>
-        <td><%= @booking_staff[date] || 0 %></td>
+        
+        <!-- Breakdown CS -->
+        <td>
+          <% if @cs_breakdown[date].any? %>
+            <ul class="ps-3 mb-0">
+            <% @cs_breakdown[date].each do |name, cnt| %>
+              <li><strong><%= name %></strong>: <%= cnt %></li>
+            <% end %>
+            </ul>
+          <% else %>
+            0
+          <% end %>
+        </td>
+
+        <!-- Breakdown Staff Cabang -->
+        <td>
+          <% if @staff_breakdown[date].any? %>
+            <ul class="ps-3 mb-0">
+            <% @staff_breakdown[date].each do |name, cnt| %>
+              <li><strong><%= name %></strong>: <%= cnt %></li>
+            <% end %>
+            </ul>
+          <% else %>
+            0
+          <% end %>
+        </td>
       </tr>
     <% end %>
   </tbody>
 </table>
+

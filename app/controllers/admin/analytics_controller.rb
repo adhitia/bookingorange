@@ -3,37 +3,51 @@ class Admin::AnalyticsController < ApplicationController
   before_action :authorize_admin
 
   def bookings
-    @branches = Branch.all
-  
-    # Filter berdasarkan tanggal created_at, default 7 hari terakhir
-    @start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : 7.days.ago.to_date
-    @end_date   = params[:end_date].present?   ? Date.parse(params[:end_date])   : Date.today
-    @branch_id  = params[:branch_id]
+    @branches     = Branch.all
+    @start_date   = params[:start_date].present? ? Date.parse(params[:start_date]) : 7.days.ago.to_date
+    @end_date     = params[:end_date].present?   ? Date.parse(params[:end_date])   : Date.today
+    @branch_id    = params[:branch_id]
     @tipe_booking = params[:tipe_booking]
-
-    # Ambil booking berdasarkan created_at dalam rentang waktu lokal (asumsi disimpan sebagai local time)
-    if @tipe_booking.blank?
-      bookings = Booking.where(created_at: @start_date.beginning_of_day..@end_date.end_of_day).where.not(tipe_booking: :non_patient)
-    else
-      bookings = Booking.where(created_at: @start_date.beginning_of_day..@end_date.end_of_day, tipe_booking: @tipe_booking)
+  
+    base_scope = Booking
+                   .where(created_at: @start_date.beginning_of_day..@end_date.end_of_day)
+                   .yield_self { |s| @tipe_booking.blank? ? s.where.not(tipe_booking: :non_patient) : s.where(tipe_booking: @tipe_booking) }
+    base_scope = base_scope.where(branch_id: @branch_id) if @branch_id.present?
+  
+    # total per tanggal
+    @total_booking = base_scope.group("DATE(created_at)").count
+  
+    # ambil user id/ nama per role
+    cs_users    = User.where(role: :customer_service).pluck(:id, :name).to_h
+    staff_users = User.where(role: :staff_cabang).pluck(:id, :name).to_h
+  
+    # group per tanggal + user_id
+    cs_grouped    = base_scope.where(created_by_id: cs_users.keys)
+                              .group("DATE(created_at)", :created_by_id)
+                              .count
+    staff_grouped = base_scope.where(created_by_id: staff_users.keys)
+                              .group("DATE(created_at)", :created_by_id)
+                              .count
+  
+    # bangun struktur breakdown: { date => [[name, count], …] }
+    @cs_breakdown    = Hash.new { |h,k| h[k] = [] }
+    cs_grouped.each do |(date, uid), cnt|
+      @cs_breakdown[date] << [ cs_users[uid], cnt ]
     end
-    
-    bookings = bookings.where(branch_id: @branch_id) if @branch_id.present?
   
-    # Gunakan query grouping manual dengan SQL function DATE(created_at)
-    @total_booking = bookings.group("DATE(created_at)").count
+    @staff_breakdown = Hash.new { |h,k| h[k] = [] }
+    staff_grouped.each do |(date, uid), cnt|
+      @staff_breakdown[date] << [ staff_users[uid], cnt ]
+    end
   
-    # Asumsikan user memiliki enum role: { admin: 0, customer_service: 1, staff_cabang: 2 }
-    cs_ids = User.where(role: :customer_service).pluck(:id)
-    staff_ids = User.where(role: :staff_cabang).pluck(:id)
-  
-    @booking_cs = bookings.where(created_by_id: cs_ids).group("DATE(created_at)").count
-    @booking_staff = bookings.where(created_by_id: staff_ids).group("DATE(created_at)").count
-  
-    # Ubah hasil grouping menjadi format array untuk Chartkick, misalnya:
-    @chart_total = @total_booking.sort_by { |date, _| date }.map { |date, count| [date, count] }
-    @chart_cs = @booking_cs.sort_by { |date, _| date }.map { |date, count| [date, count] }
-    @chart_staff = @booking_staff.sort_by { |date, _| date }.map { |date, count| [date, count] }
+    # untuk Chartkick
+    @chart_total  = @total_booking.sort_by { |d,_| d }.map { |d,c| [d,c] }
+    @chart_cs     = cs_grouped.group_by { |(d,_),_| d }
+                              .map { |d,pairs| [d, pairs.sum{ |_,c| c }] }
+                              .sort_by(&:first)
+    @chart_staff  = staff_grouped.group_by { |(d,_),_| d }
+                              .map { |d,pairs| [d, pairs.sum{ |_,c| c }] }
+                              .sort_by(&:first)
   end
 
   private
