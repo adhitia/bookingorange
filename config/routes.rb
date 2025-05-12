@@ -8,6 +8,9 @@ Rails.application.routes.draw do
   end
 
   # Routing booking untuk aksi reschedule, cancel, dan tampil detail booking
+  get  '/pendaftaran',          to: 'bookings#register_outside',       as: 'pendaftaran'
+  post '/pendaftaran',          to: 'bookings#create_register_outside', as: 'create_pendaftaran'
+
   resources :bookings, only: [:show, :edit, :update, :index] do
     collection do
       get  :new_cs   # Form pembuatan booking customer service

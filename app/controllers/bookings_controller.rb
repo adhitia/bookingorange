@@ -1,5 +1,6 @@
 class BookingsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_user!, except: [:register_outside, :create_register_outside]
+  layout 'pendaftaran', only: [:register_outside, :create_register_outside]
 
   def index
     @branches = Branch.all
@@ -116,6 +117,119 @@ class BookingsController < ApplicationController
   end
   
   
+    # form page
+    def register_outside
+      @branches = Branch.all
+      if params[:branch_id].present? && params[:date].present?
+        @selected_branch = Branch.find(params[:branch_id])
+        @selected_date = Date.parse(params[:date])
+        # Konversi nama hari ke Bahasa Indonesia
+        day_name = convert_to_indonesian(@selected_date.strftime("%A"))
+        
+        # Ambil semua jadwal rutin untuk cabang dan hari tersebut
+        schedules = @selected_branch.schedules.where(day: day_name)
+        
+        @available_slots = []
+        # Durasi default booking adalah 30 menit
+        booking_duration = 30.minutes
+        schedules.each do |schedule|
+          slot_time = schedule.start_time
+          while slot_time + booking_duration <= schedule.end_time
+            candidate_start = slot_time
+            candidate_end   = slot_time + booking_duration
+    
+            # Cek apakah ada booking yang tumpang tindih dengan interval kandidat,
+            # kecuali booking yang telah dibatalkan (status: canceled).
+            conflict = Booking.where(schedule_id: schedule.id, booking_date: @selected_date)
+                              .where.not(status: 'canceled')
+                              .where("booking_time < ? AND booking_end_time > ?", candidate_end, candidate_start)
+                              .exists?
+            unless conflict
+              @available_slots << { schedule: schedule, slot_time: slot_time }
+            end
+    
+            slot_time += booking_duration
+          end
+        end
+      else
+        @available_slots = []
+      end
+      @booking = Booking.new
+    end
+  
+    # handle submit
+    def create_register_outside
+      bp = booking_params.except(:slot_combined)
+      slot_combined = booking_params[:slot_combined]
+    
+      @booking = Booking.new(bp)
+      # Misalnya, untuk CS, cabang diambil dari form (atau bisa juga otomatis)
+      @booking.branch = Branch.find(booking_params[:branch_id]) if booking_params[:branch_id].present?
+      @booking.created_by_id = 1
+    
+      if slot_combined.present?
+        schedule_id, slot_str = slot_combined.split("|")
+        schedule = Schedule.find(schedule_id)
+        @booking.schedule = schedule
+        @booking.booking_time = Time.zone.parse(slot_str)
+        @booking.doctor = schedule.doctor
+      else
+        @booking.errors.add(:base, "Slot harus dipilih")
+        render :register_outside and return
+      end
+    
+      # Set default booking_end_time: jika tidak diisi, set menjadi booking_time + 30 menit
+      if booking_params[:booking_end_time].blank?
+        @booking.booking_end_time = @booking.booking_time + 30.minutes
+      else
+        @booking.booking_end_time = Time.zone.parse(booking_params[:booking_end_time])
+      end
+      
+      @booking.status = :scheduled
+
+      if @booking.save
+        flash[:notice] = "Booking berhasil dibuat."
+        redirect_to pendaftaran_path
+      else
+        flash.now[:alert] = "Gagal membuat booking."
+        register_outside
+        render :register_outside
+      end
+    end
+    
+    def schedules
+      @selected_branch = Branch.find(params[:branch_id])
+      @selected_date = Date.parse(params[:date])
+      # Konversi nama hari ke Bahasa Indonesia
+      day_name = convert_to_indonesian(@selected_date.strftime("%A"))
+      
+      # Ambil semua jadwal rutin untuk cabang dan hari tersebut
+      schedules = @selected_branch.schedules.where(day: day_name)
+      
+      @available_slots = []
+      # Durasi default booking adalah 30 menit
+      booking_duration = 30.minutes
+      schedules.each do |schedule|
+        slot_time = schedule.start_time
+        while slot_time + booking_duration <= schedule.end_time
+          candidate_start = slot_time
+          candidate_end   = slot_time + booking_duration
+  
+          # Cek apakah ada booking yang tumpang tindih dengan interval kandidat,
+          # kecuali booking yang telah dibatalkan (status: canceled).
+          conflict = Booking.where(schedule_id: schedule.id, booking_date: @selected_date)
+                            .where.not(status: 'canceled')
+                            .where("booking_time < ? AND booking_end_time > ?", candidate_end, candidate_start)
+                            .exists?
+          unless conflict
+            @available_slots << { schedule: schedule, slot_time: slot_time }
+          end
+  
+          slot_time += booking_duration
+        end
+      end
+      render json: @available_slots.map { |s| { id: s.id, text: s.time_slot } }
+    end
 
   private
 

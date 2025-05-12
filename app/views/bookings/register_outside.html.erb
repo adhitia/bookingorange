@@ -1,0 +1,69 @@
+
+<!-- Form Filter: Hanya untuk memilih Cabang & Tanggal -->
+<%= form_with url: pendaftaran_path, method: :get, local: true, html: { class: 'space-y-6 mb-10' } do %>
+  <div>
+    <%= label_tag :branch_id, 'Cabang', class: 'block text-gray-700 font-medium mb-1' %>
+    <%= select_tag :branch_id,
+          options_from_collection_for_select(@branches, :id, :name, params[:branch_id]),
+          prompt: 'Pilih Cabang',
+          class: 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500' %>
+  </div>
+
+  <div>
+    <%= label_tag :date, 'Tanggal', class: 'block text-gray-700 font-medium mb-1' %>
+    <%= date_field_tag :date,
+                     params[:date],
+                     class: 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500' %>
+  </div>
+
+  <div>
+    <%= submit_tag 'Filter Jadwal', class: 'w-full py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition' %>
+  </div>
+<% end %>
+
+<% if @selected_branch && @selected_date %>
+  <h2 class="text-xl font-semibold text-gray-800 mb-4">
+    Jadwal Tersedia untuk <span class="text-indigo-600"><%= @selected_branch.name %></span> pada <span class="text-indigo-600"><%= @selected_date.strftime("%d-%m-%Y") %></span>
+  </h2>
+
+  <%= form_with model: @booking, url: create_pendaftaran_path, method: :post, local: true, html: { class: 'space-y-6' } do |f| %>
+    <%= f.hidden_field :branch_id, value: @selected_branch.id %>
+    <%= f.hidden_field :booking_date, value: @selected_date %>
+
+    <div>
+      <%= f.label :slot_combined, 'Pilih Slot', class: 'block text-gray-700 font-medium mb-1' %>
+      <select name="booking[slot_combined]" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <option value="">Pilih Slot</option>
+        <% @available_slots.each do |slot| %>
+          <% schedule = slot[:schedule] %>
+          <% slot_time = slot[:slot_time] %>
+          <option value="<%= "#{schedule.id}|#{slot_time.strftime('%H:%M')}" %>">
+            <%= "#{slot_time.strftime('%H:%M')} - #{(slot_time + 30.minutes).strftime('%H:%M')}" %>
+          </option>
+        <% end %>
+      </select>
+    </div>
+
+    <div>
+      <%= f.label :customer_name, 'Nama', class: 'block text-gray-700 font-medium mb-1' %>
+      <%= f.text_field :customer_name,
+                       class: 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500' %>
+    </div>
+
+    <div>
+      <%= f.label :customer_phone, 'Nomor Whatsapp', class: 'block text-gray-700 font-medium mb-1' %>
+      <%= f.text_field :customer_phone,
+                       class: 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500' %>
+    </div>
+
+    <div>
+      <%= f.label :keterangan, 'Keterangan', class: 'block text-gray-700 font-medium mb-1' %>
+      <%= f.text_field :keterangan,
+                       class: 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500' %>
+    </div>
+
+    <div>
+      <%= f.submit 'Buat Booking', class: 'w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition' %>
+    </div>
+  <% end %>
+<% end %>
