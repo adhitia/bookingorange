@@ -68,22 +68,21 @@
     <% @total_booking.keys.sort.each do |date| %>
       <% dom_id = date.strftime("%Y%m%d") %>
       <tr>
+        <!-- Tanggal -->
         <td><%= date.strftime("%d-%m-%Y") %></td>
-        
-        <!-- Total Booking -->
+
+        <!-- Total keseluruhan -->
         <td><%= @total_booking[date] || 0 %></td>
-        
-        <!-- Customer Service -->
+
+        <!-- Breakdown CS -->
         <td>
-          <% total_cs = @booking_cs[date] || 0 %>
+          <% total_cs = (@cs_breakdown[date] || []).sum { |_,cnt| cnt } %>
           <%= total_cs %>
-          <% if @cs_breakdown[date].any? %>
-            <!-- toggle link -->
+          <% if (@cs_breakdown[date] || []).any? %>
             <a class="ms-2" data-bs-toggle="collapse" href="#cs-<%= dom_id %>" role="button"
                aria-expanded="false" aria-controls="cs-<%= dom_id %>">
               Detail
             </a>
-            <!-- hidden breakdown -->
             <div class="collapse mt-1" id="cs-<%= dom_id %>">
               <ul class="ps-3 mb-0">
                 <% @cs_breakdown[date].each do |name, cnt| %>
@@ -93,12 +92,12 @@
             </div>
           <% end %>
         </td>
-        
-        <!-- Staff Cabang -->
+
+        <!-- Breakdown Staff Cabang -->
         <td>
-          <% total_staff = @booking_staff[date] || 0 %>
+          <% total_staff = (@staff_breakdown[date] || []).sum { |_,cnt| cnt } %>
           <%= total_staff %>
-          <% if @staff_breakdown[date].any? %>
+          <% if (@staff_breakdown[date] || []).any? %>
             <a class="ms-2" data-bs-toggle="collapse" href="#st-<%= dom_id %>" role="button"
                aria-expanded="false" aria-controls="st-<%= dom_id %>">
               Detail
@@ -116,4 +115,3 @@
     <% end %>
   </tbody>
 </table>
-
