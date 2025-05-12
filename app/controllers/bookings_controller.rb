@@ -234,7 +234,7 @@ class BookingsController < ApplicationController
   private
 
   def booking_params
-    params.require(:booking).permit(:branch_id, :booking_date, :booking_time, :booking_end_time, :customer_name, :customer_phone, :slot_combined, :keterangan)
+    params.require(:booking).permit(:service_id, :branch_id, :booking_date, :booking_time, :booking_end_time, :customer_name, :customer_phone, :slot_combined, :keterangan)
   end
 
   # Konversi nama hari dari bahasa Inggris ke Bahasa Indonesia

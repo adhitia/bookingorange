@@ -63,6 +63,12 @@
       <%= f.text_field :keterangan, class: "form-control" %>
     </div>
 
+    <div class="mb-3">
+      <%= f.label :service_id, "Jenis Layanan", class: "form-label" %>
+      <%= f.collection_select :service_id, Service.all, :id, :name,
+            { prompt: "Pilih Layanan" }, { class: "form-select" } %>
+    </div>
+
     <div class="d-grid">
       <%= f.submit "Buat Booking", class: "btn btn-success" %>
     </div>

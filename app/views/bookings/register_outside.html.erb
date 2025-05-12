@@ -56,6 +56,12 @@
                        class: 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500' %>
     </div>
 
+    <div class="mb-3">
+        <%= f.label :service_id, "Jenis Layanan", class: "form-label" %>
+        <%= f.collection_select :service_id, Service.all, :id, :name,
+              { prompt: "Pilih Layanan" }, { class: "form-select" } %>
+      </div>
+
     <div>
       <%= f.label :keterangan, 'Keterangan', class: 'block text-gray-700 font-medium mb-1' %>
       <%= f.text_field :keterangan,

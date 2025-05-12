@@ -74,6 +74,12 @@
             class: "form-control" %>
     </div>
 
+    <div class="mb-3">
+      <%= f.label :service_id, "Jenis Layanan", class: "form-label" %>
+      <%= f.collection_select :service_id, Service.all, :id, :name,
+            { prompt: "Pilih Layanan" }, { class: "form-select" } %>
+    </div>
+    
     <!-- Field baru untuk keterangan -->
     <div class="mb-3">
       <%= f.label :keterangan, "Keterangan", class: "form-label" %>
