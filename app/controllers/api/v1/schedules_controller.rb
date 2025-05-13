@@ -26,7 +26,7 @@ module Api
           schedules.each do |schedule|
             slot_time = schedule.start_time
 
-            while (slot_time + booking_duration) <= (schedule.end_time-30.minutes)
+            while (slot_time + booking_duration) <= (schedule.end_time-60.minutes)
               candidate_start = slot_time
               candidate_end   = slot_time + booking_duration
               
