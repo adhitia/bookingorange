@@ -1,5 +1,5 @@
 class BookingsController < ApplicationController
-  before_action :authenticate_user!, except: [:register_outside, :create_register_outside]
+  before_action :authenticate_user!, except: [:register_outside, :create_register_outside, :thank_you_register]
   layout 'pendaftaran', only: [:register_outside, :create_register_outside, :thank_you_register]
 
   def index
