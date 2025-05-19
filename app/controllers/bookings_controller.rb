@@ -1,6 +1,6 @@
 class BookingsController < ApplicationController
   before_action :authenticate_user!, except: [:register_outside, :create_register_outside]
-  layout 'pendaftaran', only: [:register_outside, :create_register_outside]
+  layout 'pendaftaran', only: [:register_outside, :create_register_outside, :thank_you_register]
 
   def index
     @branches = Branch.all
@@ -189,12 +189,17 @@ class BookingsController < ApplicationController
 
       if @booking.save
         flash[:notice] = "Booking berhasil dibuat."
-        redirect_to pendaftaran_path
+        redirect_to terima_kasih_pendaftaran_path(id: @booking.id)
       else
         flash.now[:alert] = "Gagal membuat booking."
         register_outside
         render :register_outside
       end
+    end
+
+    def thank_you_register
+      @booking = Booking.find(params[:id])
+      @branches = Branch.all
     end
     
     def schedules
