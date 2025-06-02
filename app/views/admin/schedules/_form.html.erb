@@ -1,3 +1,5 @@
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
 <%= form_with(model: [:admin, schedule], local: true) do |form| %>
   <% if schedule.errors.any? %>
     <div class="alert alert-danger">
@@ -12,7 +14,12 @@
 
   <div class="mb-3">
     <%= form.label :doctor_id, "Dokter", class: "form-label" %>
-    <%= form.collection_select :doctor_id, Doctor.all, :id, :name, { prompt: "Pilih Dokter" }, { class: "form-select" } %>
+    <select id="doctor-select" name="schedule[doctor_id]" class="form-select">
+      <option value="">Pilih Dokter</option>
+      <% Doctor.all.each do |doctor| %>
+        <option value="<%= doctor.id %>" <%= "selected" if schedule.doctor_id == doctor.id %>><%= doctor.name %></option>
+      <% end %>
+    </select>
   </div>
 
   <div class="mb-3">
@@ -39,3 +46,16 @@
     <%= form.submit "Simpan Jadwal", class: "btn btn-primary" %>
   </div>
 <% end %>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    new TomSelect("#doctor-select", {
+      create: false,
+      sortField: {
+        field: "text",
+        direction: "asc"
+      }
+    });
+  });
+</script>
