@@ -24,7 +24,12 @@
 
   <div class="mb-3">
     <%= form.label :branch_id, "Cabang", class: "form-label" %>
-    <%= form.collection_select :branch_id, Branch.all, :id, :name, { prompt: "Pilih Cabang" }, { class: "form-select" } %>
+    <select id="branch-select" name="schedule[branch_id]" class="form-select">
+      <option value="">Pilih Cabang</option>
+      <% Branch.all.each do |branch| %>
+        <option value="<%= branch.id %>" <%= "selected" if schedule.branch_id == branch.id %>><%= branch.name %></option>
+      <% end %>
+    </select>
   </div>
 
   <div class="mb-3">
@@ -57,5 +62,14 @@
         direction: "asc"
       }
     });
+
+    new TomSelect("#branch-select", {
+      create: false,
+      sortField: {
+        field: "text",
+        direction: "asc"
+      }
+    });
+    
   });
 </script>
