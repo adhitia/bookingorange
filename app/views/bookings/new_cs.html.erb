@@ -1,12 +1,20 @@
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <h1>Booking (Customer Service)</h1>
 
 <!-- Form Filter: Hanya untuk memilih Cabang & Tanggal -->
 <%= form_with url: new_cs_bookings_path, method: :get, local: true do %>
-  <div class="mb-3">
-    <%= label_tag :branch_id, "Cabang", class: "form-label" %>
-    <%= select_tag :branch_id, options_from_collection_for_select(@branches, :id, :name, params[:branch_id]),
-          prompt: "Pilih Cabang", class: "form-select" %>
-  </div>
+  
+<div class="mb-3">
+  <%= label_tag :branch_id, "Cabang", class: "form-label" %>
+  <select id="branch-select" name="branch_id" class="form-select">
+    <option value="">Pilih Cabang</option>
+    <% Branch.all.each do |branch| %>
+      <option value="<%= branch.id %>"><%= branch.name %></option>
+    <% end %>
+  </select>
+</div>
+
+
 
   <div class="mb-3">
     <%= label_tag :date, "Tanggal", class: "form-label" %>
@@ -74,3 +82,16 @@
     </div>
   <% end %>
 <% end %>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    new TomSelect("#branch-select", {
+      create: false,
+      sortField: {
+        field: "text",
+        direction: "asc"
+      }
+    });
+      
+  });
+</script>
