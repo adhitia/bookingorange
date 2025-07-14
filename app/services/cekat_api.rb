@@ -26,7 +26,7 @@ module CekatApi
 
     # Contoh payload. Pastikan field inbox_id disesuaikan, misalnya bisa diambil dari booking atau dari konfigurasi.
     payload = {
-      wa_template_id: "1797383624165360",  # Sesuaikan template ID yang telah di-APPROVED
+      wa_template_id: "1193063419170055",  # Sesuaikan template ID yang telah di-APPROVED
       template_body_variables: [
         booking.customer_name
       ],
