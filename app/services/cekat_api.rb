@@ -26,7 +26,7 @@ module CekatApi
 
     # Contoh payload. Pastikan field inbox_id disesuaikan, misalnya bisa diambil dari booking atau dari konfigurasi.
     payload = {
-      wa_template_id: "1193063419170055",  # Sesuaikan template ID yang telah di-APPROVED
+      wa_template_id: "1797383624165360",  # Sesuaikan template ID yang telah di-APPROVED
       template_body_variables: [
         booking.customer_name
       ],
@@ -105,7 +105,7 @@ module CekatApi
       "api_key" => API_KEY
     }
     # Ganti dengan template ID yang telah diset di cekat.ai untuk reminder
-    template_id = "574437655747839" 
+    template_id = "1193063419170055" 
 
     # Format tanggal menggunakan helper (pastikan helper indonesian_date sudah didefinisikan)
     formatted_date = booking.booking_date.present? ? ApplicationController.helpers.indonesian_date(booking.booking_date) : ""
