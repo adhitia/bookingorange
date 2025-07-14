@@ -105,7 +105,7 @@ module CekatApi
       "api_key" => API_KEY
     }
     # Ganti dengan template ID yang telah diset di cekat.ai untuk reminder
-    template_id = "664182436109824" 
+    template_id = "574437655747839" 
 
     # Format tanggal menggunakan helper (pastikan helper indonesian_date sudah didefinisikan)
     formatted_date = booking.booking_date.present? ? ApplicationController.helpers.indonesian_date(booking.booking_date) : ""
@@ -114,13 +114,6 @@ module CekatApi
 
     payload = {
       wa_template_id: template_id,
-      template_body_variables: [
-        booking.customer_name,   # Misalnya: "Halo {{1}}!"
-        "Dokter Gigi",
-        booking.branch.name,          # Misalnya: "Senin, 17 Maret 2025"
-        formatted_time,          # Misalnya: "10:00"
-        "https://wa.me/#{sanitize_phone_number(booking.branch.phone)}"  # Misalnya: "https://wa.me/628123456789"
-      ],
       inbox_id: "c76d94c4-4de3-4703-ab00-75ac56cee2be",
       phone_number: sanitize_phone_number(booking.customer_phone),
       phone_name: booking.customer_name
