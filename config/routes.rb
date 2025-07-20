@@ -7,6 +7,8 @@ Rails.application.routes.draw do
     resources :bookings, only: [:new, :create]
   end
 
+  resources :patients, only: [:new, :create]
+  
   # Routing booking untuk aksi reschedule, cancel, dan tampil detail booking
   get  '/pendaftaran',          to: 'bookings#register_outside',       as: 'pendaftaran'
   get  '/thank_you_register',      to: 'bookings#thank_you_register',   as: 'terima_kasih_pendaftaran'
