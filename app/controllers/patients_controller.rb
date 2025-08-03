@@ -3,12 +3,13 @@ class PatientsController < ApplicationController
 
   def new
     @patient = Patient.new
+    @booking = Booking.find_by(id: params[:booking]) if params[:booking].present?
   end
 
   def create
     @patient = Patient.new(patient_params)
     if @patient.save
-      redirect_to new_patient_path  , notice: 'Data pasien berhasil disimpan.'
+      redirect_to today_staff_bookings_path  , notice: 'Data pasien berhasil disimpan.'
     else
       render :new
     end

@@ -26,11 +26,27 @@
       </div>
     <% end %>
 
+    <div class="row">
+    <div class="col-md-6 mb-3">
+      <hr>
+      <div class="row mb-3 align-items-center">
+        <div class="col-md-8">
+          <h5>Bagikan Link Pasien baru</h5>
+        </div>
+        <div class="col-md-4 text-center">
+          <%# Memanggil helper untuk merender QR code %>
+          <%= render_qr_code(params[:booking]) %>
+        </div>
+      </div>
+    <hr>
+    </div>
+  </div>
+
     <%= form_with(model: @patient, local: true, html: { class: 'space-y-4' }) do |f| %>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <%= f.label :full_name, "Nama Lengkap", class: "block font-medium text-gray-700" %>
-          <%= f.text_field :full_name, required: true, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
+          <%= f.text_field :full_name, required: true, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2", value: @booking.customer_name %>
         </div>
 
         <div>
@@ -55,7 +71,7 @@
 
         <div>
           <%= f.label :phone_number, "No. Telp Pribadi", class: "block font-medium text-gray-700" %>
-          <%= f.text_field :phone_number, required: true, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
+          <%= f.text_field :phone_number, required: true, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2", value: @booking.customer_phone %>
         </div>
 
         <div>

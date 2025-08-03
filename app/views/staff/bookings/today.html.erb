@@ -23,10 +23,11 @@
         <td><%= booking.doctor.name if booking.doctor %></td>
         <td>
           <%= booking.customer_name %><br>
-          <small><%= booking.customer_phone %></small>
+          <small><%= booking.customer_phone %></small>..
         </td>
         <td><%= booking.status.titleize %></td>
         <td>
+          <%= link_to "Isi Data Pasien baru", new_patient_path(booking:booking), class: "btn btn-sm btn-info" %> <br />
           <%= link_to "Show", staff_booking_path(booking), class: "btn btn-sm btn-info" %>
           <%= link_to "Edit/Reschedule", edit_staff_booking_path(booking), class: "btn btn-sm btn-warning" %>
           <%= button_to "Cancel", cancel_staff_booking_path(booking), method: :patch, data: { confirm: "Anda yakin?" }, class: "btn btn-sm btn-danger" %>
