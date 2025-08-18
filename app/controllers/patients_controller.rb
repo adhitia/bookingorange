@@ -2,8 +2,12 @@ class PatientsController < ApplicationController
   layout 'internal_form'
 
   def new
-    @patient = Patient.new
-    @booking = Booking.find_by(id: params[:booking]) if params[:booking].present?
+    if params[:booking_id].present?
+      @booking = Booking.find_by(id: params[:booking_id])
+    else
+      render :booking_code, alert: 'Masukan Kode Booking yang benar.'
+    end
+
   end
 
   def create

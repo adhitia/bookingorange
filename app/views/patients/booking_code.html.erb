@@ -1,0 +1,26 @@
+<!-- Pembatas dan Judul untuk Form Pencarian -->
+<div class="relative my-8">
+  <div class="absolute inset-0 flex items-center" aria-hidden="true">
+    <div class="w-full border-t border-gray-300"></div>
+  </div>
+  <div class="relative flex justify-center">
+    <span class="bg-white px-3 text-lg font-medium text-gray-900">Sudah Punya Kode Booking?</span>
+  </div>
+</div>
+
+<!-- Form Pencarian Booking ID -->
+<%= form_with(url: new_patient_path, method: :get, local: true, class: "space-y-6") do |form| %>
+  <div>
+    <%= form.label :booking_id, "Masukkan Booking ID", class: "block text-sm font-medium text-gray-700" %>
+    <div class="mt-1">
+      <%= form.text_field :booking_id,
+                          required: true,
+                          placeholder: "Contoh: OD-12345",
+                          class: "appearance-none block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm" %>
+    </div>
+  </div>
+
+  <div>
+    <%= form.submit "Cari Data Pasien", class: "w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer" %>
+  </div>
+<% end %>

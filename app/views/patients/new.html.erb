@@ -1,17 +1,4 @@
-<h1 class="mb-4">Input Data Pasien Baru</h1>
-
-<%= form_with model: @patient, local: true, html: { class: "needs-validation" } do |f| %>
-  <% if @patient.errors.any? %>
-    <div class="alert alert-danger">
-      <h5><%= pluralize(@patient.errors.count, "error") %> tidak dapat disimpan:</h5>
-      <ul>
-        <% @patient.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-  <div class="row">
+<div class="row">
     <div class="col-md-6 mb-3">
       <hr>
       <div class="row mb-3 align-items-center">
@@ -26,95 +13,86 @@
     <hr>
     </div>
   </div>
-  
 
+    <%= form_with(model: @patient, local: true, html: { class: 'space-y-4' }) do |f| %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <%= f.label :full_name, "Nama Lengkap", class: "block font-medium text-gray-700" %>
+          <%= f.text_field :full_name, required: true, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2", value: @booking.customer_name %>
+        </div>
 
-  <div class="row">
-    <div class="col-md-6 mb-3">
-      <%= f.label :full_name, "Nama Lengkap*", class: "form-label" %>
-      <%= f.text_field :full_name, class: "form-control" %>
-    </div>
-    <div class="col-md-6 mb-3">
-      <%= f.label :identity_number, "No. KTP / SIM / Passport", class: "form-label" %>
-      <%= f.text_field :identity_number, class: "form-control" %>
-    </div>
-  </div>
+        <div>
+          <%= f.label :identity_number, "No. KTP / SIM / Passport", class: "block font-medium text-gray-700" %>
+          <%= f.text_field :identity_number, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
+        </div>
 
-  <div class="mb-3">
-    <%= f.label :gender, "Jenis Kelamin*", class: "form-label d-block" %>
-    <div class="form-check form-check-inline">
-      <%= f.radio_button :gender, "Laki-Laki", class: "form-check-input", id: "gender_male" %>
-      <%= f.label :gender, "Laki-Laki", value: "Laki-Laki", class: "form-check-label", for: "gender_male" %>
-    </div>
-    <div class="form-check form-check-inline">
-      <%= f.radio_button :gender, "Perempuan", class: "form-check-input", id: "gender_female" %>
-      <%= f.label :gender, "Perempuan", value: "Perempuan", class: "form-check-label", for: "gender_female" %>
-    </div>
-  </div>
+        <div>
+          <%= f.label :gender, "Jenis Kelamin", class: "block font-medium text-gray-700" %>
+          <%= f.select :gender, ['Laki-Laki', 'Perempuan'], {}, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
+        </div>
 
-  <div class="row">
-    <div class="col-md-6 mb-3">
-      <%= f.label :birth_place, "Tempat Lahir*", class: "form-label" %>
-      <%= f.text_field :birth_place, class: "form-control" %>
-    </div>
-    <div class="col-md-6 mb-3">
-      <%= f.label :birth_date, "Tanggal Lahir (dd/mm/yyyy)*", class: "form-label" %>
-      <%= f.date_field :birth_date, class: "form-control", value: Date.today.strftime('%Y-%m-%d') %>
-    </div>
-  </div>
+        <div>
+          <%= f.label :place_of_birth, "Tempat Lahir", class: "block font-medium text-gray-700" %>
+          <%= f.text_field :place_of_birth, required: true, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
+        </div>
 
-  <div class="row">
-    <div class="col-md-6 mb-3">
-      <%= f.label :phone, "No Telp Pribadi*", class: "form-label" %>
-      <%= f.text_field :phone, class: "form-control" %>
-    </div>
-    <div class="col-md-6 mb-3">
-      <%= f.label :email, "Email*", class: "form-label" %>
-      <%= f.email_field :email, class: "form-control" %>
-    </div>
-  </div>
+        <div>
+          <%= f.label :date_of_birth, "Tanggal Lahir", class: "block font-medium text-gray-700" %>
+          <%= f.date_field :date_of_birth, required: true, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
+        </div>
 
-  <div class="mb-3">
-    <%= f.label :address, "Alamat (sesuai identitas)*", class: "form-label" %>
-    <%= f.text_field :address, class: "form-control" %>
-  </div>
+        <div>
+          <%= f.label :phone_number, "No. Telp Pribadi", class: "block font-medium text-gray-700" %>
+          <%= f.text_field :phone_number, required: true, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2", value: @booking.customer_phone %>
+        </div>
 
-  <div class="row">
-    <div class="col-md-3 mb-3">
-      <%= f.label :village, "Kelurahan", class: "form-label" %>
-      <%= f.text_field :village, class: "form-control" %>
-    </div>
-    <div class="col-md-3 mb-3">
-      <%= f.label :district, "Kecamatan", class: "form-label" %>
-      <%= f.text_field :district, class: "form-control" %>
-    </div>
-    <div class="col-md-3 mb-3">
-      <%= f.label :city, "Kabupaten/Kota", class: "form-label" %>
-      <%= f.text_field :city, class: "form-control" %>
-    </div>
-    <div class="col-md-3 mb-3">
-      <%= f.label :province, "Provinsi", class: "form-label" %>
-      <%= f.text_field :province, class: "form-control" %>
-    </div>
-  </div>
+        <div>
+          <%= f.label :email, "Email", class: "block font-medium text-gray-700" %>
+          <%= f.email_field :email, required: true, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
+        </div>
 
-  <div class="mb-3">
-    <%= f.label :blood_type, "Golongan Darah*", class: "form-label" %>
-    <%= f.text_field :blood_type, class: "form-control" %>
-  </div>
+        <div class="md:col-span-2">
+          <%= f.label :address, "Alamat (sesuai identitas)", class: "block font-medium text-gray-700" %>
+          <%= f.text_area :address, required: true, rows: 3, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
+        </div>
 
-  <div class="row">
-    <div class="col-md-6 mb-3">
-      <%= f.label :emergency_contact_name, "Nama Kerabat Terdekat*", class: "form-label" %>
-      <%= f.text_field :emergency_contact_name, class: "form-control" %>
-    </div>
-    <div class="col-md-6 mb-3">
-      <%= f.label :emergency_contact_phone, "No. Telp Kerabat Terdekat*", class: "form-label" %>
-      <%= f.text_field :emergency_contact_phone, class: "form-control" %>
-    </div>
-  </div>
+        <div>
+          <%= f.label :subdistrict, "Kelurahan", class: "block font-medium text-gray-700" %>
+          <%= f.text_field :subdistrict, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
+        </div>
 
-  <div class="mb-3 text-end">
-    <%= f.submit "Simpan", class: "btn btn-primary px-4" %>
-  </div>
-<% end %>
+        <div>
+          <%= f.label :district, "Kecamatan", class: "block font-medium text-gray-700" %>
+          <%= f.text_field :district, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
+        </div>
+
+        <div>
+          <%= f.label :city, "Kabupaten/Kota", class: "block font-medium text-gray-700" %>
+          <%= f.text_field :city, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
+        </div>
+
+        <div>
+          <%= f.label :province, "Provinsi", class: "block font-medium text-gray-700" %>
+          <%= f.text_field :province, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
+        </div>
+
+        <div>
+          <%= f.label :blood_type, "Golongan Darah", class: "block font-medium text-gray-700" %>
+          <%= f.select :blood_type, ['A', 'B', 'AB', 'O'], {}, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
+        </div>
+
+        <div>
+          <%= f.label :emergency_contact_name, "Nama Kontak Darurat", class: "block font-medium text-gray-700" %>
+          <%= f.text_field :emergency_contact_name, required: true, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
+        </div>
+
+        <div class="md:col-span-2">
+          <%= f.label :emergency_contact_phone, "No. Telp Kontak Darurat", class: "block font-medium text-gray-700" %>
+          <%= f.text_field :emergency_contact_phone, required: true, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
+        </div>
+      </div>
+
+      <div class="flex justify-center mt-6">
+        <%= f.submit "Simpan", class: "bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-full shadow-md transition duration-300" %>
+      </div>
+    <% end %>
