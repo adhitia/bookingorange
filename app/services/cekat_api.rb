@@ -105,7 +105,11 @@ module CekatApi
       "api_key" => API_KEY
     }
     # Ganti dengan template ID yang telah diset di cekat.ai untuk reminder
-    template_id = "1193063419170055" 
+    if booking.service_id == 1
+      template_id = "1193063419170055" 
+    else
+      template_id = "616498304821376" # Template untuk tambal gigi
+    end
 
     # Format tanggal menggunakan helper (pastikan helper indonesian_date sudah didefinisikan)
     formatted_date = booking.booking_date.present? ? ApplicationController.helpers.indonesian_date(booking.booking_date) : ""

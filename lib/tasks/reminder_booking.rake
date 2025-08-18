@@ -6,7 +6,7 @@ namespace :booking do
       puts "Mengirim reminder untuk #{bookings.count} booking hari ini."
       
       bookings.each do |booking|
-        if booking.service_id == 1
+        if booking.service_id == 1 || booking.service_id == 2
           result = CekatApi.send_template_reminder(booking)
           if result && result["success"]
             puts "Reminder berhasil dikirim untuk booking #{booking.id}."
