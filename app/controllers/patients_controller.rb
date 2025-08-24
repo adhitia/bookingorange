@@ -3,6 +3,7 @@ class PatientsController < ApplicationController
 
   def new
     if params[:booking_id].present?
+      @patient = Patient.new
       @booking = Booking.find_by(id: params[:booking_id])
     else
       render :booking_code, alert: 'Masukan Kode Booking yang benar.'
@@ -13,7 +14,7 @@ class PatientsController < ApplicationController
   def create
     @patient = Patient.new(patient_params)
     if @patient.save
-      redirect_to today_staff_bookings_path  , notice: 'Data pasien berhasil disimpan.'
+      redirect_to new_patient_path  , notice: 'Data pasien berhasil disimpan.'
     else
       render :new
     end
@@ -31,7 +32,7 @@ class PatientsController < ApplicationController
   def patient_params
     params.require(:patient).permit(
       :full_name, :identity_number, :gender, :place_of_birth, :date_of_birth, :phone_number, :email, :address,
-      :village, :district, :city, :province, :blood_type, :emergency_contact_name, :emergency_contact_phone
+      :village, :district, :city, :province, :blood_type, :emergency_contact_name, :emergency_contact_phone, :referral_code
     )
   end
 end

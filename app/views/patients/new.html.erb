@@ -3,7 +3,6 @@
       <hr>
       <div class="row mb-3 align-items-center">
         <div class="col-md-8">
-          <h5>Bagikan Link Pasien baru</h5>
         </div>
         <div class="col-md-4 text-center">
           <%# Memanggil helper untuk merender QR code %>
@@ -90,6 +89,12 @@
           <%= f.label :emergency_contact_phone, "No. Telp Kontak Darurat", class: "block font-medium text-gray-700" %>
           <%= f.text_field :emergency_contact_phone, required: true, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
         </div>
+
+        <div class="md:col-span-2">
+          <%= f.label :referral_code, "Kode Referensi", class: "block font-medium text-gray-700" %>
+          <%= f.text_field :referral_code, required: true, class: "mt-1 block w-full border border-gray-300 rounded-lg p-2" %>
+        </div>
+
       </div>
 
       <div class="flex justify-center mt-6">
