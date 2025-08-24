@@ -7,7 +7,7 @@ class Booking < ApplicationRecord
   belongs_to :doctor
   belongs_to :schedule
   belongs_to :created_by, class_name: "User", optional: true
-  belongs_to :service, optional: true
+  belongs_to :service
   # validate :no_duplicate_booking
   default_scope { where(deleted_at: nil) }
 
