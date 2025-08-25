@@ -1,7 +1,6 @@
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <h1>Booking (Customer Service)</h1>
 
-<!-- Form Filter: Hanya untuk memilih Cabang & Tanggal -->
 <%= form_with url: new_cs_bookings_path, method: :get, local: true do %>
   
 <div class="mb-3">
@@ -13,8 +12,6 @@
     <% end %>
   </select>
 </div>
-
-
 
   <div class="mb-3">
     <%= label_tag :date, "Tanggal", class: "form-label" %>
@@ -31,13 +28,12 @@
   <h2>Jadwal Tersedia untuk <%= @selected_branch.name %> pada <%= @selected_date.strftime("%d-%m-%Y") %></h2>
 
   <%= form_with model: @booking, url: create_cs_bookings_path, method: :post, local: true do |f| %>
-    <!-- Hidden field untuk menyimpan cabang dan tanggal booking -->
     <%= f.hidden_field :branch_id, value: @selected_branch.id %>
     <%= f.hidden_field :booking_date, value: @selected_date %>
 
     <div class="mb-3">
       <%= f.label :slot_combined, "Pilih Slot", class: "form-label" %>
-      <select name="booking[slot_combined]" class="form-select">
+      <select id="slot-select" name="booking[slot_combined]" class="form-select">
         <option value="">Pilih Slot</option>
         <% @available_slots.each do |slot| %>
           <% schedule = slot[:schedule] %>
@@ -50,12 +46,6 @@
     </div>
 
     <div class="mb-3">
-      <%= f.label :booking_end_time, "Waktu Selesai", class: "form-label" %>
-      <%= f.time_field :booking_end_time, class: "form-control" %>
-      <small class="form-text text-muted">Jika dikosongkan, akan otomatis 30 menit setelah waktu mulai.</small>
-    </div>
-
-    <div class="mb-3">
       <%= f.label :customer_name, "Nama Customer", class: "form-label" %>
       <%= f.text_field :customer_name, class: "form-control" %>
     </div>
@@ -65,7 +55,6 @@
       <%= f.text_field :customer_phone, class: "form-control" %>
     </div>
 
-    <!-- Field baru untuk keterangan -->
     <div class="mb-3">
       <%= f.label :keterangan, "Keterangan", class: "form-label" %>
       <%= f.text_field :keterangan, class: "form-control" %>
@@ -74,7 +63,15 @@
     <div class="mb-3">
       <%= f.label :service_id, "Jenis Layanan", class: "form-label" %>
       <%= f.collection_select :service_id, Service.all, :id, :name,
-            { prompt: "Pilih Layanan" }, { class: "form-select", required: true } %>
+            { prompt: "Pilih Layanan" }, 
+            { class: "form-select", required: true, data: { durations: @service_durations } } %>
+            <%# ^^^^ TAMBAHKAN data attribute di sini ^^^^ %>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :booking_end_time, "Waktu Selesai (Otomatis)", class: "form-label" %>
+      <%= f.time_field :booking_end_time, class: "form-control", readonly: true %> 
+      <%# 'readonly: true' opsional, agar user tidak mengubah manual %>
     </div>
 
     <div class="d-grid">
@@ -85,6 +82,7 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    // Inisialisasi TomSelect untuk dropdown Cabang (sesuai script Anda)
     new TomSelect("#branch-select", {
       create: false,
       sortField: {
@@ -92,6 +90,51 @@
         direction: "asc"
       }
     });
-      
+
+    // --- LOGIKA UNTUK MENGISI WAKTU SELESAI ---
+    const slotSelect = document.getElementById('slot-select'); // Menggunakan id yang kita tambahkan
+    const serviceSelect = document.getElementById('booking_service_id');
+    const endTimeInput = document.getElementById('booking_booking_end_time');
+    
+    // Ambil data durasi dari atribut data-* dan parse sebagai JSON
+    const serviceDurations = JSON.parse(serviceSelect.dataset.durations || '{}');
+    const defaultDuration = 30; // Durasi default dalam menit
+
+    function updateEndTime() {
+      const slotValue = slotSelect.value;
+      const serviceId = serviceSelect.value;
+
+      // Hentikan jika slot atau layanan belum dipilih
+      if (!slotValue || !serviceId) {
+        endTimeInput.value = ''; // Kosongkan field
+        return;
+      }
+
+      // 1. Dapatkan waktu mulai dari format "schedule_id|HH:MM"
+      const startTimeString = slotValue.split('|')[1];
+      if (!startTimeString) return;
+
+      // 2. Dapatkan durasi dari service yang dipilih
+      const durationInMinutes = serviceDurations[serviceId] || defaultDuration;
+
+      // 3. Kalkulasi waktu selesai
+      const [hours, minutes] = startTimeString.split(':').map(Number);
+      const startTime = new Date();
+      startTime.setHours(hours, minutes, 0, 0); // Set waktu mulai
+
+      const endTime = new Date(startTime.getTime() + durationInMinutes * 60000);
+
+      // 4. Format waktu selesai ke dalam format HH:MM
+      const endHours = endTime.getHours().toString().padStart(2, '0');
+      const endMinutes = endTime.getMinutes().toString().padStart(2, '0');
+      const formattedEndTime = `${endHours}:${endMinutes}`;
+
+      // 5. Set nilai ke input field waktu selesai
+      endTimeInput.value = formattedEndTime;
+    }
+
+    // Pasang listener ke kedua dropdown
+    slotSelect.addEventListener('change', updateEndTime);
+    serviceSelect.addEventListener('change', updateEndTime);
   });
 </script>

@@ -37,6 +37,18 @@ class BookingsController < ApplicationController
   # Form booking untuk Customer Service
   def new_cs
     @branches = Branch.all
+    @service_durations = {
+        1 => 60,  # Scaling
+        2 => 60,  # Tambal Gigi
+        3 => 60,  # Cabut Gigi
+        5 => 90,  # Bleaching
+        6 => 60,  # Veneer
+        7 => 60,  # Implant
+        8 => 60,  # Perawatan Saluran Akar
+        9 => 30   # Pemeriksaan Gigi (diasumsikan sebagai Konsultasi)
+        # Behel Gigi (Konsul) bisa dipetakan ke ID 9 juga jika relevan
+     }.to_json # Konversi ke JSON agar mudah dibaca oleh JavaScript
+
     if params[:branch_id].present? && params[:date].present?
       @selected_branch = Branch.find(params[:branch_id])
       @selected_date = Date.parse(params[:date])
